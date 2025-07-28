@@ -1,0 +1,21 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+.conntainer {
+    height: 144px;
+    background-color: $primary-color;
+    margin-top: -50px;
+    @include flex_box_custom(space-between, center, 0px);
+    
+}
+
+.containerCard {
+    @include flex_box_custom(center, center, 10px);
+    width: 280px;
+    height: 104px;
+}
+
+.containerContent{
+    @include flex_box_custom(center, center, 10px);
+    flex-direction: column;
+    color: $white-color;
+}

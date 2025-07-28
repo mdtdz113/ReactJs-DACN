@@ -1,0 +1,95 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+.container {
+    @include flex_box_custom(center, center, 0px);
+
+    left: 0;
+    right: 0;
+}
+.topHeader {
+    position: absolute;
+    top: 0;
+}
+.containerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 83px;
+    width: 1250px;
+    // background-color: #e3d74b;
+}
+.containerBoxIcon {
+    @include flex_box_custom(center, center, 15px);
+    &:hover {
+        cursor: pointer;
+    }
+}
+.containerMenu {
+    @include flex_box_custom(center, center, 25px);
+}
+.containerBox {
+    @include flex_box_custom(center, center, 25px);
+}
+.boxIcon {
+    @include radius_common(50%);
+    @include flex_box_custom(center, center, 0px);
+    background-color: $primary_color;
+    width: 26px;
+    height: 26px;
+}
+.menu {
+    cursor: pointer;
+    padding-top: 8px;
+    font-size: 15px;
+    color: $primary_color;
+    position: relative;
+
+    .submenu{
+        position: absolute;
+        background-color: #ffffffe6;
+        width: 100%;
+        padding: 10px;
+        top: 40px;
+    }
+}
+.menu::after {
+    content: '';
+    display: block;
+    height: 3px;
+    background-color: $primary_color;
+    // transform-origin: right;
+    transform: scale(0);
+    transition: transform 0.3s ease-in-out;
+}
+.menu:hover::after {
+    transform: scale(1);
+}
+
+.fixedHeader {
+    position: fixed;
+    top: -83px;
+    background-color: #ffffffe6;
+    z-index: 999;
+    box-shadow: 2px 0px 12px 0px rgba(0, 0, 0, 0.15);
+    transform: translateY(83px);
+    backdrop-filter: blur(5px);
+    transition: transform 0.7s ease;
+}
+
+.boxCart{
+    position: relative;
+    .quantity{
+        position: absolute;
+        top: -5px;
+        right: -10px;
+        width: 15px;
+        height: 15px;
+        background-color: $primary_color;
+        border-radius: 50%;
+        @include flex_box_custom(center, center, 0px);
+        @include radius_common(50%);
+        color: white;
+        font-size: 10px;
+
+    }
+}

@@ -1,0 +1,32 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+.container {
+    background-image: url('https://xstore.8theme.com/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/photo-of-man-wearing-white-hoodie-5474310.jpeg');
+    height: 409px;
+    width: calc(100% / 2);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.containerTimmer {
+    @include flex_box_custom(center, center, 10px);
+}
+
+.title {
+    color: $secondary-color;
+    font-size: 28px;
+    margin-bottom: 5px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.boxBtn {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn {
+    margin-top: 40px;
+    @include btn(176px, 42px, 3px, rgb(0, 0, 0));
+    color: $white_color;
+}

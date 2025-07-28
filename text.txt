@@ -1,0 +1,5 @@
+npm i
+
+chay project: npm run dev
+
+npm install normalize.css

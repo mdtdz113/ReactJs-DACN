@@ -1,0 +1,18 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+.container{
+    margin-top: 20px;
+    padding-top: 30px;
+    background-color: $primary_color;
+}
+.content{
+    @include flex_box_custom(center, center, 0px)
+}
+
+.content1{
+    @include flex_box_custom(center, center, 30px);
+    color: $white_color;
+    font-size: 18px;
+    font-weight: 600;
+    padding-top: 40px;
+}

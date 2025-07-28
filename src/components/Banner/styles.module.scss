@@ -1,0 +1,22 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+.container {
+    @include flex_box_custom(center, center, 0px);
+    background-image: url('../../assets/images/Banner.jpeg');
+    height: 750px;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    background-position: center;
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn {
+    margin-top: 40px;
+    @include btn(176px, 42px, 3px, rgb(0, 0, 0));
+    color: $white_color;
+}

@@ -1,0 +1,29 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+.container {
+    margin-bottom: 20px;
+    .lableInput {
+        font-size: 14px;
+        color: $four-color;
+        margin-bottom: 5px;
+    }
+    .boxInput {
+        width: 100%;
+        position: relative;
+        input {
+            width: 100%;
+            padding: 10px 0 10px 0;
+        }
+
+        .boxIcon {
+            position: absolute;
+            top: 11px;
+            right: 2px;
+        }
+    }
+    .errMsg{
+        font-size: 12px;
+        color: red;
+    }
+    
+}
