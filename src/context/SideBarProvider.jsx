@@ -10,6 +10,7 @@ export const SideBarProvider = ({ children }) => {
     const userId = Cookies.get('userId');
     const [listProductCart, setListProductCart] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [detailsProduct, setDetailsProduct] = useState(null);
     const hangleGetListProductCart = (userId, type) => {
         if (userId && type === 'cart') {
             setIsLoading(true);
@@ -33,7 +34,9 @@ export const SideBarProvider = ({ children }) => {
         listProductCart,
         isLoading,
         setIsLoading,
-        userId
+        userId,
+        detailsProduct,
+        setDetailsProduct
     };
     useEffect(() => {
         hangleGetListProductCart(userId, 'cart');

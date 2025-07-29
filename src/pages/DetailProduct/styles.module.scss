@@ -1,0 +1,286 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+
+.container {
+    margin-top: 82px;
+    .functionbox {
+        @include flex_box_custom(space-between, center, 0px);
+        color: $secondary_color;
+        margin-bottom: 20px;
+        font-size: 14px;
+        .specialText {
+            color: $primary_color;
+            font-weight: 400;
+        }
+        .btnBack {
+            cursor: pointer;
+        }
+    }
+    .contentSection {
+        @include flex_box_custom(unset, flex-start, 0px);
+
+        .imgSection {
+            max-width: 610px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            img {
+                width: calc(100% / 2 - 10px);
+                height: 350px;
+                object-fit: cover;
+                border-radius: 3px;
+            }
+        }
+    }
+    .TextSection {
+        margin-left: 20px;
+        flex-grow: 1;
+        h1 {
+            font-size: 24px;
+            margin-top: 0px;
+            font-weight: 400;
+            color: $four-color;
+        }
+        .priceText {
+            color: $secondary_color;
+            font-size: 20px;
+        }
+        p {
+            font-size: 16px;
+            color: $thr_color;
+        }
+        .titleSize {
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: $thr-color;
+        }
+        .boxSize {
+            @include flex_box_custom(flex-start, center, 10px);
+            margin-bottom: 30px;
+            .size {
+                @include flex_box_custom(center, center, 0px);
+                border: 1px solid $thr-color;
+                padding: 6px 10px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+        }
+        .addToCartContainer {
+            @include flex_box_custom(center, center, 30px);
+            margin-top: 10px;
+            .quantityControl {
+                @include flex_box_custom(center, center, 0px);
+                button {
+                    background-color: #f0f0f0;
+                    border: none;
+                    padding: 9px 4px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    color: #555;
+                    transition: background-color 0.2s ease-in-out;
+
+                    &:hover {
+                        background-color: #e0e0e0;
+                    }
+
+                    &:first-child {
+                        border-right: 1px solid #ccc;
+                    }
+
+                    &:last-child {
+                        border-left: 1px solid #ccc;
+                    }
+                }
+
+                span {
+                    padding: 5px 8px;
+                    font-size: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 40px;
+                    text-align: center;
+                }
+            }
+        }
+        .containermethods {
+            padding: 25px 0;
+            position: relative;
+            border: 1px solid $four-color;
+            margin-top: 40px;
+            .titleMethods {
+                position: absolute;
+                top: -8px;
+                transform: translateX(-50%);
+                left: 45%;
+                background-color: #fff;
+                padding: 0 1px;
+                text-transform: uppercase;
+                font-size: 14px;
+                span {
+                    color: #2d7e32;
+                }
+            }
+            .boxImageMethods {
+                @include flex_box_custom(center, center, 10px);
+            }
+            .imageMethods {
+                border: 1px solid #e1e1e1;
+                max-width: 50%;
+                width: 50px;
+                height: 34px;
+                border-radius: 5px;
+            }
+        }
+        .textOr {
+            @include flex_box_custom(center, center, 0px);
+            margin-top: 10px;
+            .line {
+                width: 49%;
+                height: 1px;
+                background-color: #888;
+            }
+            .orLine {
+                color: #888;
+            }
+        }
+        .textSecure {
+            text-align: center;
+            margin-top: 10px;
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .textBrand {
+            @include flex_box_custom(flex-start, center, 39px);
+            margin-top: 18px;
+            font-size: 16px;
+
+            .titleBrand {
+                font-weight: 400;
+            }
+            .decbrand {
+                color: #888;
+            }
+        }
+
+        .boxIcons {
+            @include flex_box_custom(flex-start, center, 10px);
+            margin-top: 30px;
+            .cricleIcon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%; /* Quan trọng nhất để tạo hình tròn */
+                font-weight: 400;
+                font-size: 30px;
+                width: 50px;
+                height: 50px;
+
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.containerInfo {
+    div:last-child {
+        border-bottom: unset;
+    }
+    .itemInfo {
+        @include flex_box_custom(flex-start, center, 0px);
+        border-bottom: 1px solid #e1e1e1;
+        padding: 10px 0;
+        div {
+            width: 50%;
+        }
+    }
+}
+
+.containerReview {
+    .reviews {
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e1e1e1;
+    }
+
+    .noreview {
+        font-size: 14px;
+        color: $thr_color;
+        margin-bottom: 20px;
+    }
+
+    .replyForm {
+        padding-top: 30px;
+
+        .commentReplyTitle {
+            font-size: 14px;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #e1e1e1;
+            color: $thr_color;
+        }
+
+        .commentTotes {
+            font-size: 14px;
+            color: $thr_color;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+
+            .commentFormCookiesConsent {
+                display: flex;
+                align-items: flex-start;
+                gap: 5px;
+
+                input {
+                    margin-top: 3px;
+                }
+
+                span {
+                    color: $thr_color;
+                }
+            }
+
+            .btnSubmit {
+                width: 100%;
+                max-width: 110px;
+            }
+        }
+    }
+}
+
+.formItem {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .boxItemStar {
+        display: flex;
+        gap: 25px;
+    }
+
+    label {
+        color: $thr_color;
+
+        span {
+            color: #c62828;
+        }
+    }
+
+    input,
+    textarea {
+        border: 1px solid #e1e1e1;
+        padding: 8px 15px;
+        outline: none;
+
+        &:focus {
+            border: 1px solid $secondary_color;
+        }
+    }
+}

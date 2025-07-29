@@ -12,6 +12,7 @@ import { SideBarContext } from '@/context/SideBarProvider';
 import { ToastContext } from '@/context/ToastProvider';
 import { addProductToCart } from '@/apis/cartService';
 import Loading from '@components/Loading/Loading';
+import { useNavigate } from 'react-router-dom';
 function ProductItem({
     src,
     prevSrc,
@@ -25,9 +26,11 @@ function ProductItem({
     const ourShopStore = useContext(OurShopContext);
     const [isShowGrid, setIsShowGrid] = useState(ourShopStore?.isShowGrid);
     const userId = Cookies.get('userId');
-    const { setIsOpen, setType, hangleGetListProductCart } = useContext(SideBarContext);
+    const { setIsOpen, setType, hangleGetListProductCart, setDetailsProduct } =
+        useContext(SideBarContext);
     const { toast } = useContext(ToastContext);
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
     const {
         boxImg,
         showFncWhenHover,
@@ -95,17 +98,47 @@ function ProductItem({
                 setIsLoading(false);
             });
     };
+
+    const handleNavigateToProductDetail = () => {
+        const path = `/product/${details._id}`;
+
+        navigate(path);
+    };
+    const handleShowDetailProductSidebar = () => {
+        setIsOpen(true);
+        setType('detail');
+        setDetailsProduct(details);
+    };
     return (
         <div className={isShowGrid ? '' : containerItem}>
             <div className={boxImg}>
                 <img src={src} alt='' />
-                <img src={prevSrc} alt='' className={showImgWhenHover} />
+                <img
+                    src={prevSrc}
+                    alt=''
+                    className={showImgWhenHover}
+                    onClick={() => handleNavigateToProductDetail()}
+                />
                 <div className={showFncWhenHover}>
                     <div>
-                        <MdOutlineShoppingBag className={boxIcon} />
-                        <FaRegHeart className={boxIcon} />
-                        <TfiReload className={boxIcon} />
-                        <MdOutlineRemoveRedEye className={boxIcon} />
+                        <div className={boxIcon}>
+                            {' '}
+                            <MdOutlineShoppingBag />
+                        </div>
+                        <div className={boxIcon}>
+                            {' '}
+                            <FaRegHeart />
+                        </div>
+                        <div className={boxIcon}>
+                            {' '}
+                            <TfiReload />
+                        </div>
+                        <div className={boxIcon}>
+                            {' '}
+                            <MdOutlineRemoveRedEye
+                                onClick={handleShowDetailProductSidebar}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

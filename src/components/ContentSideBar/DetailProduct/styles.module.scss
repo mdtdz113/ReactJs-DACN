@@ -1,0 +1,79 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+
+.container {
+    padding: 20px;
+
+    .titleName {
+        font-size: 24px;
+        color: $four-color;
+        margin-top: 30px;
+    }
+    .titlePrice {
+        font-size: 19px;
+        color: $secondary_color;
+        margin-top: 8px;
+    }
+    p {
+        color: $secondary_color;
+    }
+    span {
+        color: $secondary_color;
+    }
+    .boxSize {
+        @include flex_box_custom(left, center, 20px);
+        margin-top: 10px;
+        .sizeDetail {
+            @include flex_box_custom(center, center, 0px);
+
+            border: 1px solid #9f9f9f;
+            padding: 9px 9px;
+            font-size: 12px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: rgb(185, 185, 185);
+                transition: background-color 500ms;
+            }
+
+            .isActivate {
+                background-color: rgb(24, 22, 22);
+            }
+        }
+    }
+    .textClear {
+        color: $secondary_color;
+        font-size: 12px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
+    .boxBtn {
+        @include flex_box_custom(center, center, 20px);
+        margin-top: 10px;
+        select {
+            width: 65px;
+            height: 36px;
+        }
+    }
+    .boxOr {
+        @include flex_box_custom(center, center, 10px);
+        margin: 10px 0;
+
+        .line {
+            width: 100%;
+            height: 1px;
+            background-color: #e1e1e1;
+        }
+        .Or {
+            color: $secondary_color;
+        }
+    }
+    .textIcon {
+        @include flex_box_custom(left, center, 10px);
+        margin: 10px 0;
+        cursor: pointer;
+    }
+    .textdes {
+        color: $secondary_color;
+    }
+}

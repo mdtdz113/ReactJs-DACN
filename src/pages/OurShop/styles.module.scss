@@ -51,11 +51,7 @@
             @include flex_box_custom(center, center, 10px);
         }
     }
-    .selextBox {
-        border: 1px solid #e1e1e1;
-        padding: 5px;
-        color: $secondary_color;
-    }
+
     .selextBox.sort {
         width: 275px;
     }
@@ -119,4 +115,10 @@
             transform: rotate(0.5turn);
         }
     }
+}
+
+.selextBox {
+    border: 1px solid #e1e1e1;
+    padding: 5px;
+    color: $secondary_color;
 }

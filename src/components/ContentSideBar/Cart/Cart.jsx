@@ -74,7 +74,7 @@ function Cart() {
                     <div>
                         <div>
                             <span>Subtotal:</span>
-                            <span>${subTotal}</span>
+                            <span>${subTotal.toFixed(2)}</span>
                         </div>
                         <div className={btnWist}>
                             <MyButton

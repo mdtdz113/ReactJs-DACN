@@ -9,6 +9,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        cursor: pointer;
     }
 
     &:hover .showImgWhenHover {
@@ -24,7 +25,22 @@
         right: 0;
         bottom: 0;
     }
+    .boxIcon {
+        width: 40px;
+        height: 40px;
+        @include flex_box_custom(center, center, 10px);
 
+        cursor: pointer;
+
+        // img{
+        //     width: 10px;
+        //     height: 10px;
+        // }
+        &:hover {
+            background-color: rgb(222, 222, 222);
+            transition: background-color 500ms;
+        }
+    }
     &:hover .showFncWhenHover {
         opacity: 1;
         right: 20px;
@@ -39,24 +55,6 @@
         bottom: 20px;
         right: 0px;
         background-color: white;
-    }
-
-    .boxIcon {
-        width: 30px;
-        height: 30px;
-        @include flex_box_custom(center, center, 10px);
-
-        cursor: pointer;
-
-        // img {
-        //     width: 17px;
-        //     height: 17px;
-        // }
-
-        &:hover {
-            background-color: rgb(222, 222, 222);
-            transition: background-color 500ms;
-        }
     }
 }
 .title {
