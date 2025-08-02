@@ -19,7 +19,8 @@ function ProductItem({
     name,
     price,
     details,
-    isHomePage = true
+    isHomePage = true,
+    slideItem = false
 }) {
     // const { isShowGrid } = useContext(OurShopContext);
     const [sizeChoose, setSizeChoose] = useState('');
@@ -109,6 +110,10 @@ function ProductItem({
         setType('detail');
         setDetailsProduct(details);
     };
+
+    useEffect(() => {
+        if(slideItem) setIsShowGrid(true);
+    }, [slideItem]);
     return (
         <div className={isShowGrid ? '' : containerItem}>
             <div className={boxImg}>

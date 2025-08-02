@@ -5,13 +5,14 @@ import 'slick-carousel/slick/slick-theme.css';
 import { IoIosArrowBack } from 'react-icons/io';
 import { IoIosArrowForward } from 'react-icons/io';
 import './styles.css';
+import ProductItem from '@components/ProductItem/ProductItem';
 
-function SliderCommon(data) {
+function SliderCommon({ data, isProductItem = false, showItem = 1 }) {
     var settings = {
         dots: true,
         infinite: true,
         speed: 500,
-        slidesToShow: 1,
+        slidesToShow: showItem,
         slidesToScroll: 1,
         nextArrow: <IoIosArrowForward />,
         prevArrow: <IoIosArrowBack />
@@ -19,8 +20,26 @@ function SliderCommon(data) {
 
     return (
         <Slider {...settings}>
-            {data.data.map((src, index) => {
-                return <img src={src} alt='test' key={index} />;
+            {data.map((item, index) => {
+                const src = item?.images ? item?.images[0] : item.image;
+                console.log(src);
+                return (
+                    <>
+                        {isProductItem ? (
+                            <ProductItem
+                                src={src}
+                                name={item.name}
+                                price={item.price}
+                                prevSrc={src}
+                                details={item}
+                                isHomePage={false}
+                                slideItem
+                            />
+                        ) : (
+                            <img src={item} alt='test' key={index} />
+                        )}
+                    </>
+                );
             })}
         </Slider>
     );

@@ -57,13 +57,17 @@
         }
         .boxSize {
             @include flex_box_custom(flex-start, center, 10px);
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             .size {
                 @include flex_box_custom(center, center, 0px);
                 border: 1px solid $thr-color;
                 padding: 6px 10px;
                 font-size: 12px;
                 cursor: pointer;
+            }
+
+            .isActiceSize {
+                background-color: #888;
             }
         }
         .addToCartContainer {
@@ -135,7 +139,7 @@
         }
         .textOr {
             @include flex_box_custom(center, center, 0px);
-            margin-top: 10px;
+            margin: 10px 0;
             .line {
                 width: 49%;
                 height: 1px;
@@ -283,4 +287,28 @@
             border: 1px solid $secondary_color;
         }
     }
+}
+
+.Clear {
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+.activaceDisableBtn {
+    cursor: not-allowed;
+    background-color: #888;
+}
+.activaceDisableBtn:hover {
+    background-color: #888;
+    color: #e0e0e0;
+}
+
+.loadingCart {
+    height: 902px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e8e8e8;
 }

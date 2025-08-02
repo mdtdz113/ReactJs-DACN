@@ -1,8 +1,18 @@
+import classNames from 'classnames';
 import styles from './style.module.scss';
 
-function MyButton({ content, ...props }) {
+function MyButton({ content, customClassname = false, ...props }) {
     const { btn } = styles;
-    return <button className={btn} {...props}>{content}</button>;
+    return (
+        <button
+            className={classNames(btn, {
+                [customClassname]: customClassname
+            })}
+            {...props}
+        >
+            {content}
+        </button>
+    );
 }
 
 export default MyButton;
