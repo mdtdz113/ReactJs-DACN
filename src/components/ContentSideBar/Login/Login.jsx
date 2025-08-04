@@ -62,9 +62,11 @@ function Login() {
                         Cookies.set('refreshToken', refreshToken);
                         setIsOpen(false);
                         hangleGetListProductCart(id, 'cart');
+                        toast.success(res.data.message);
                     })
                     .catch((err) => {
                         setIsLoading(false);
+                        toast.error(err.response.data.message);
                     });
             }
         }

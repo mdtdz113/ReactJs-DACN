@@ -13,6 +13,7 @@ import { ToastContext } from '@/context/ToastProvider';
 import { addProductToCart } from '@/apis/cartService';
 import Loading from '@components/Loading/Loading';
 import { useNavigate } from 'react-router-dom';
+import { handleAddProductToCartCommon } from '@/utils/helper';
 function ProductItem({
     src,
     prevSrc,
@@ -66,38 +67,17 @@ function ProductItem({
     }, [isHomePage, ourShopStore?.isShowGrid]);
 
     const hangleAddToCart = () => {
-        console.log(userId);
-        if (!userId) {
-            setIsOpen(true);
-            setType('login');
-            toast.warning('please login to add product to cart');
-            return;
-        }
-
-        if (!sizeChoose) {
-            toast.warning('please choose size');
-            return;
-        }
-
-        const data = {
+       handleAddProductToCartCommon(
             userId,
-            productId: details._id,
-            quantity: 1,
-            size: sizeChoose
-        };
-        setIsLoading(true);
-        addProductToCart(data)
-            .then((res) => {
-                setIsOpen(true);
-                setType('cart');
-                toast.success('add product to cart success');
-                setIsLoading(false);
-                hangleGetListProductCart(userId, 'cart');
-            })
-            .catch((err) => {
-                toast.error('add product to cart failed');
-                setIsLoading(false);
-            });
+            setIsOpen,
+            setType,
+            toast,
+            sizeChoose,
+            details._id,
+            1,
+            setIsLoading,
+            hangleGetListProductCart
+        );
     };
 
     const handleNavigateToProductDetail = () => {

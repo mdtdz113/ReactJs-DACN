@@ -13,6 +13,7 @@ import { useContext } from 'react';
 import { TfiReload } from 'react-icons/tfi';
 import { IoHeartOutline } from 'react-icons/io5';
 import { IoCartOutline } from 'react-icons/io5';
+import { StoreContext } from '@/context/storeProvider';
 function MyHeader() {
     const {
         containerHeader,
@@ -28,8 +29,19 @@ function MyHeader() {
 
     const { scrollPosition } = useScrollHandling();
     const [fixedPosition, setFixedPosition] = useState(false);
-    const { setType, setIsOpen, listProductCart } = useContext(SideBarContext);
+    const { userInfo } = useContext(StoreContext);
+    const {
+        setType,
+        setIsOpen,
+        listProductCart,
+        userId,
+        hangleGetListProductCart
+    } = useContext(SideBarContext);
 
+    const handleOpenCart = () => {
+        hangleGetListProductCart(userId, 'cart');
+        handleOpenSidebar('cart');
+    };
     const handleOpenSidebar = (type) => {
         setIsOpen(true);
         setType(type);
@@ -42,6 +54,12 @@ function MyHeader() {
             setFixedPosition(false);
         }
     }, [scrollPosition]);
+
+    const totalItemCart = listProductCart.length
+        ? listProductCart.reduce((acc, item) => {
+              return (acc += item.quantity);
+          }, 0)
+        : 0;
 
     return (
         <div
@@ -93,10 +111,10 @@ function MyHeader() {
                         <div className={boxCart}>
                             <IoCartOutline
                                 style={{ fontSize: '25px' }}
-                                onClick={() => handleOpenSidebar('cart')}
+                                onClick={() => handleOpenCart()}
                             />
                             <div className={quantity}>
-                                {listProductCart.length}
+                                {totalItemCart || userInfo?.amountCart || 0}
                             </div>
                         </div>
                     </div>

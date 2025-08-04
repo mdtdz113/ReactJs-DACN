@@ -2,7 +2,7 @@ import MyHeader from '@components/Header/Header';
 import MainLayout from '@components/Layout/Layout';
 import styles from './styles.module.scss';
 import MyButton from '@components/Button/Button';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FaRegHeart } from 'react-icons/fa';
 import { TfiReload } from 'react-icons/tfi';
 import AccordionMenu from '@components/AccordionMenu';
@@ -11,12 +11,17 @@ import ReviewProduct from '@/pages/DetailProduct/components/review';
 import MyFooter from '@components/Footer/Footer';
 import SliderCommon from '@components/SliderCommon/SliderCommon';
 import ReactImageMagnifier from 'simple-image-magnifier/react';
-import { data, useParams } from 'react-router-dom';
+import { data, useNavigate, useParams } from 'react-router-dom';
 import cls from 'classnames';
 import { getDetailProduct } from '@/apis/productServer';
 import { use } from 'react';
 import Loading from '@components/Loading/Loading';
 import { getRelatedProduct } from '@/apis/productServer';
+import { handleAddProductToCartCommon } from '@/utils/helper';
+import { SideBarContext } from '@/context/SideBarProvider';
+import { ToastContext } from '@/context/ToastProvider';
+import Cookies from 'js-cookie';
+import { addProductToCart } from '@/apis/cartService';
 
 function DetailProduct() {
     const {
@@ -49,13 +54,23 @@ function DetailProduct() {
         isActiceSize,
         Clear,
         activaceDisableBtn,
-        loadingCart
+        loadingCart,
+        noData,
+        loader
     } = styles;
 
     const [isLoading, setIsLoading] = useState(true);
     const [sizeSelected, setSizeSelected] = useState('');
     const [quantity, setQuantity] = useState(1);
     const [relatedData, setRelatedData] = useState('');
+    const { setIsOpen, setType, hangleGetListProductCart, setDetailsProduct } =
+        useContext(SideBarContext);
+    const { toast } = useContext(ToastContext);
+    const [isLoadingBuyNow, setIsLoadingBuyNow] = useState(false);
+
+    const userId = Cookies.get('userId');
+    const [isLoadingBtn, setIsLoadingBtn] = useState(false);
+    const navigate = useNavigate();
     const handleSelectSize = (size) => {
         setSizeSelected(size);
     };
@@ -94,26 +109,6 @@ function DetailProduct() {
     const hangleSetMenuSelected = (id) => {
         setMenuSelected(id);
     };
-    const tempDataSilder = [
-        {
-            image: 'https://xstore.8theme.com/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image-6.2-min.jpg',
-            name: 'tesst',
-            price: '1000',
-            size: [{ name: 'S' }, { name: 'M' }, { name: 'L' }]
-        },
-        {
-            image: 'https://xstore.8theme.com/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image-6.2-min.jpg',
-            name: 'tesst',
-            price: '1000',
-            size: [{ name: 'S' }, { name: 'M' }, { name: 'L' }]
-        },
-        {
-            image: 'https://xstore.8theme.com/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image-6.2-min.jpg',
-            name: 'tesst',
-            price: '1000',
-            size: [{ name: 'S' }, { name: 'M' }, { name: 'L' }]
-        }
-    ];
 
     const handleRederZoomImage = (src) => {
         return (
@@ -138,6 +133,7 @@ function DetailProduct() {
         } catch (error) {
             console.log(error);
             setIsLoading(false);
+            setData();
         }
     };
 
@@ -151,13 +147,48 @@ function DetailProduct() {
             setIsLoading(false);
         }
     };
+    const handleBuyNow = () => {
+        const data = {
+            userId,
+            productId: param.id,
+            quantity,
+            size: sizeSelected
+        };
+        setIsLoadingBuyNow(true);
+
+        addProductToCart(data)
+            .then((res) => {
+                toast.success('Add Product to cart success!');
+                setIsLoading(false);
+                navigate('/cart');
+                setIsLoadingBuyNow(false);
+            })
+            .catch((err) => {
+                toast.error('Add Product to cart failed!');
+                setIsLoading(false);
+                setIsLoadingBuyNow(false);
+            });
+        // navigate('/cart')
+    };
     useEffect(() => {
         if (param.id) {
             fetchDataDetail(param.id);
             fetchDataRelatedProducts(param.id);
         }
     }, [param]);
-
+    const handleAdd = () => {
+        handleAddProductToCartCommon(
+            userId,
+            setIsOpen,
+            setType,
+            toast,
+            sizeSelected,
+            param.id,
+            quantity,
+            setIsLoadingBtn,
+            hangleGetListProductCart
+        );
+    };
     return (
         <div>
             <MyHeader />
@@ -167,7 +198,12 @@ function DetailProduct() {
                         <div>
                             Home &gt; <span className={specialText}>Shop</span>
                         </div>
-                        <div className={btnBack}>Return to previous page</div>
+                        <div
+                            className={btnBack}
+                            onClick={() => navigate('/shop')}
+                        >
+                            Return to previous page
+                        </div>
                     </div>
 
                     {isLoading ? (
@@ -175,134 +211,199 @@ function DetailProduct() {
                             <Loading />
                         </div>
                     ) : (
-                        <div className={contentSection}>
-                            <div className={imgSection}>
-                                {data?.images.map((src) =>
-                                    handleRederZoomImage(src)
-                                )}
-                            </div>
-                            <div className={TextSection}>
-                                <h1>{data?.name}</h1>
-                                <div className={priceText}>${data?.price}</div>
-                                <p>{data?.description}</p>
-                                <div className={titleSize}>
-                                    Size {sizeSelected}
+                        <>
+                            {!data ? (
+                                <div className={noData}>
+                                    <div className={loader}></div>
+
+                                    <div>NO DATA</div>
+                                    <div onClick={() => navigate('/shop')}>
+                                        <MyButton
+                                            content={'BACK TO OUR SHOP'}
+                                        />
+                                    </div>
                                 </div>
-                                <div className={boxSize}>
-                                    {data?.size.map((itemSize, index) => {
-                                        return (
-                                            <div
-                                                className={cls(size, {
-                                                    [isActiceSize]:
-                                                        sizeSelected ===
-                                                        itemSize.name
-                                                })}
-                                                key={index}
-                                                onClick={() =>
-                                                    handleSelectSize(
-                                                        itemSize.name
+                            ) : (
+                                <div className={contentSection}>
+                                    <div className={imgSection}>
+                                        {data?.images.map((src) =>
+                                            handleRederZoomImage(src)
+                                        )}
+                                    </div>
+                                    <div className={TextSection}>
+                                        <h1>{data?.name}</h1>
+                                        <div className={priceText}>
+                                            ${data?.price}
+                                        </div>
+                                        <p>{data?.description}</p>
+                                        <div className={titleSize}>
+                                            Size {sizeSelected}
+                                        </div>
+                                        <div className={boxSize}>
+                                            {data?.size.map(
+                                                (itemSize, index) => {
+                                                    return (
+                                                        <div
+                                                            className={cls(
+                                                                size,
+                                                                {
+                                                                    [isActiceSize]:
+                                                                        sizeSelected ===
+                                                                        itemSize.name
+                                                                }
+                                                            )}
+                                                            key={index}
+                                                            onClick={() =>
+                                                                handleSelectSize(
+                                                                    itemSize.name
+                                                                )
+                                                            }
+                                                        >
+                                                            {itemSize.name}
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
+                                        </div>
+                                        {sizeSelected && (
+                                            <p
+                                                className={Clear}
+                                                onClick={handleClearSize}
+                                            >
+                                                Clear
+                                            </p>
+                                        )}
+                                        <div className={addToCartContainer}>
+                                            <div className={quantityControl}>
+                                                <button
+                                                    onClick={handleDecrease}
+                                                >
+                                                    -
+                                                </button>
+                                                <span>{quantity}</span>
+                                                <button
+                                                    onClick={handleIncrease}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <MyButton
+                                                content={
+                                                    isLoadingBtn ? (
+                                                        <Loading />
+                                                    ) : (
+                                                        'ADD TO CART'
                                                     )
                                                 }
-                                            >
-                                                {itemSize.name}
+                                                customClassname={
+                                                    !sizeSelected &&
+                                                    activaceDisableBtn
+                                                }
+                                                onClick={handleAdd}
+                                            />
+                                        </div>
+
+                                        <div className={textOr}>
+                                            <div className={line}></div>
+                                            <div className={orLine}>OR</div>
+                                            <div className={line}></div>
+                                        </div>
+                                        <MyButton
+                                            content={
+                                                isLoadingBuyNow ? (
+                                                    <Loading />
+                                                ) : (
+                                                    'BUY NOW'
+                                                )
+                                            }
+                                            customClassname={
+                                                !sizeSelected &&
+                                                activaceDisableBtn
+                                            }
+                                            onClick={handleBuyNow}
+                                        />
+                                        <div className={containermethods}>
+                                            <div className={titleMethods}>
+                                                Guaranteed <span>safe</span>{' '}
+                                                checkout
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                                {sizeSelected && (
-                                    <p
-                                        className={Clear}
-                                        onClick={handleClearSize}
-                                    >
-                                        Clear
-                                    </p>
-                                )}
-                                <div className={addToCartContainer}>
-                                    <div className={quantityControl}>
-                                        <button onClick={handleDecrease}>
-                                            -
-                                        </button>
-                                        <span>{quantity}</span>
-                                        <button onClick={handleIncrease}>
-                                            +
-                                        </button>
-                                    </div>
-                                    <MyButton
-                                        content={'ADD TO CART'}
-                                        customClassname={
-                                            !sizeSelected && activaceDisableBtn
-                                        }
-                                    />
-                                </div>
 
-                                <div className={textOr}>
-                                    <div className={line}></div>
-                                    <div className={orLine}>OR</div>
-                                    <div className={line}></div>
-                                </div>
-                                <MyButton
-                                    content={'BUY NOW'}
-                                    customClassname={
-                                        !sizeSelected && activaceDisableBtn
-                                    }
-                                />
-                                <div className={containermethods}>
-                                    <div className={titleMethods}>
-                                        Guaranteed <span>safe</span> checkout
-                                    </div>
+                                            <div className={boxImageMethods}>
+                                                {srcMethods.map(
+                                                    (src, index) => {
+                                                        return (
+                                                            <img
+                                                                src={src}
+                                                                alt=''
+                                                                key={index}
+                                                                className={
+                                                                    imageMethods
+                                                                }
+                                                            />
+                                                        );
+                                                    }
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className={textSecure}>
+                                            Your Payment is 100% Secure
+                                        </div>
 
-                                    <div className={boxImageMethods}>
-                                        {srcMethods.map((src, index) => {
-                                            return (
-                                                <img
-                                                    src={src}
-                                                    alt=''
+                                        <div className={boxIcons}>
+                                            <div className={cricleIcon}>
+                                                <FaRegHeart />
+                                            </div>
+                                            <div className={cricleIcon}>
+                                                <TfiReload />
+                                            </div>
+                                        </div>
+
+                                        <div className={textBrand}>
+                                            <div className={titleBrand}>
+                                                Brand:{' '}
+                                            </div>
+                                            <div className={decbrand}>
+                                                {' '}
+                                                Brand 03
+                                            </div>
+                                        </div>
+                                        <div className={textBrand}>
+                                            <div className={titleBrand}>
+                                                SKU:{' '}
+                                            </div>
+                                            <div className={decbrand}>
+                                                {' '}
+                                                87654
+                                            </div>
+                                        </div>
+                                        <div className={textBrand}>
+                                            <div className={titleBrand}>
+                                                Category:{' '}
+                                            </div>
+                                            <div className={decbrand}> Men</div>
+                                        </div>
+
+                                        {dataAccordionMenu.map(
+                                            (item, index) => (
+                                                <AccordionMenu
+                                                    titleMenu={item.titleMenu}
+                                                    contentJsx={item.content}
                                                     key={index}
-                                                    className={imageMethods}
+                                                    onClick={() =>
+                                                        hangleSetMenuSelected(
+                                                            item.id
+                                                        )
+                                                    }
+                                                    isSelected={
+                                                        menuSelected === item.id
+                                                    }
                                                 />
-                                            );
-                                        })}
+                                            )
+                                        )}
                                     </div>
                                 </div>
-                                <div className={textSecure}>
-                                    Your Payment is 100% Secure
-                                </div>
-
-                                <div className={boxIcons}>
-                                    <div className={cricleIcon}>
-                                        <FaRegHeart />
-                                    </div>
-                                    <div className={cricleIcon}>
-                                        <TfiReload />
-                                    </div>
-                                </div>
-
-                                <div className={textBrand}>
-                                    <div className={titleBrand}>Brand: </div>
-                                    <div className={decbrand}> Brand 03</div>
-                                </div>
-                                <div className={textBrand}>
-                                    <div className={titleBrand}>SKU: </div>
-                                    <div className={decbrand}> 87654</div>
-                                </div>
-                                <div className={textBrand}>
-                                    <div className={titleBrand}>Category: </div>
-                                    <div className={decbrand}> Men</div>
-                                </div>
-
-                                {dataAccordionMenu.map((item, index) => (
-                                    <AccordionMenu
-                                        titleMenu={item.titleMenu}
-                                        contentJsx={item.content}
-                                        key={index}
-                                        onClick={() =>
-                                            hangleSetMenuSelected(item.id)
-                                        }
-                                        isSelected={menuSelected === item.id}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                            )}
+                        </>
                     )}
                     <div>
                         <h2>Related products</h2>

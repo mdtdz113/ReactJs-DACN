@@ -2,6 +2,8 @@ import { createContext, useEffect } from 'react';
 import { useState } from 'react';
 import { getCart } from '@/apis/cartService';
 import Cookies from 'js-cookie';
+import { useLocation, useParams } from 'react-router-dom';
+import { use } from 'react';
 export const SideBarContext = createContext();
 
 export const SideBarProvider = ({ children }) => {
@@ -11,6 +13,7 @@ export const SideBarProvider = ({ children }) => {
     const [listProductCart, setListProductCart] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [detailsProduct, setDetailsProduct] = useState(null);
+
     const hangleGetListProductCart = (userId, type) => {
         if (userId && type === 'cart') {
             setIsLoading(true);
@@ -36,11 +39,12 @@ export const SideBarProvider = ({ children }) => {
         setIsLoading,
         userId,
         detailsProduct,
-        setDetailsProduct
+        setDetailsProduct,
+        setListProductCart
     };
-    useEffect(() => {
-        hangleGetListProductCart(userId, 'cart');
-    }, []);
+    // useEffect(() => {
+    //     hangleGetListProductCart(userId, 'cart');
+    // }, []);
     return (
         <SideBarContext.Provider value={value}>
             {children}

@@ -3,13 +3,15 @@ import styles from '../../styles.module.scss';
 import CartSummer from '@/pages/Cart/components/contents/CartSummer';
 import MyButtonWhist from '@components/Button/ButtonWhist';
 import MyButton from '@components/Button/Button';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { SideBarContext } from '@/context/SideBarProvider';
 import { addProductToCart } from '@/apis/cartService';
 import { deleteItem } from '@/apis/cartService';
 import { deleteCart } from '@/apis/cartService';
 import { FaCartArrowDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { getCart } from '@/apis/cartService';
+import Cookies from 'js-cookie';
 
 function Contents() {
     const {
@@ -28,7 +30,8 @@ function Contents() {
         hangleGetListProductCart,
         isLoading,
         setIsLoading,
-        userId
+        userId,
+        setListProductCart
     } = useContext(SideBarContext);
 
     const hangleReplaceQuantity = (data) => {
@@ -71,6 +74,20 @@ function Contents() {
         navigete('/shop');
         setIsOpen(false);
     };
+
+    useEffect(() => {
+        if (userId) {
+            getCart(userId)
+                .then((res) => {
+                    setListProductCart(res.data.data);
+                    setIsLoading(false);
+                })
+                .catch((err) => {
+                    setListProductCart([]);
+                    setIsLoading(false);
+                });
+        }
+    }, []);
     return (
         <>
             {listProductCart.length > 0 ? (
