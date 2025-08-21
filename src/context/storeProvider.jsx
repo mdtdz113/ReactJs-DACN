@@ -8,18 +8,16 @@ export const StoreContext = createContext();
 export const StoreProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState(null);
 
-
     const [userId, setUserId] = useState(Cookies.get('userId'));
-   
 
     const handlelogOut = () => {
         Cookies.remove('userId');
         Cookies.remove('token');
         Cookies.remove('refreshToken');
         setUserInfo(null);
-        window.location.reload();
+        // window.location.reload();
     };
-    
+
     useEffect(() => {
         if (userId) {
             getInfo(userId)

@@ -15,7 +15,7 @@
 }
 
 .containerContent{
-    @include flex_box_custom(center, center, 10px);
+    @include flex_box_custom(start, left, 8px);
     flex-direction: column;
     color: $white-color;
 }

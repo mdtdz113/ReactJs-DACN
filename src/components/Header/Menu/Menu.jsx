@@ -13,28 +13,35 @@ function Menu({ content, href }) {
     const navigate = useNavigate();
 
     const handleClickShowLogin = () => {
-        if (content === 'Sign in' && !userInfo) {
+        if (content === 'Đăng nhập' && !userInfo) {
             setIsOpen(true);
             setType('login');
         }
-        if (content === 'Our Shop') {
+        if (content === 'Cửa hàng') {
             navigate('/shop');
         }
 
-        if (content === 'About us') {
+        if (content === 'Giới thiệu') {
             navigate('/about-us');
+        }
+        if (content === 'Trang chủ') {
+            navigate('/');
+        }
+
+        if (content === 'Đơn hàng') {
+            navigate('/ViewOrder');
         }
     };
 
     const handleRenderText = (content) => {
-        if (content === 'Sign in' && userInfo) {
-            return `Hello: ${userInfo?.username}`;
+        if (content === 'Đăng nhập' && userInfo) {
+            return `Xin chào: ${userInfo?.username}`;
         } else {
             return content;
         }
     };
     const handleGover = () => {
-        if (content === 'Sign in' && userInfo) {
+        if (content === 'Đăng nhập' && userInfo) {
             setIsShowSubMenu(true);
         }
     };
@@ -59,7 +66,7 @@ function Menu({ content, href }) {
                     className={submenu}
                     onClick={handlelogOut}
                 >
-                    LOG OUT
+                    ĐĂNG XUẤT
                 </div>
             )}
         </div>

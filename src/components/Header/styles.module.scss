@@ -17,6 +17,9 @@
     height: 83px;
     width: 1250px;
     // background-color: #e3d74b;
+    img {
+        cursor: pointer;
+    }
 }
 .containerBoxIcon {
     @include flex_box_custom(center, center, 15px);
@@ -44,7 +47,7 @@
     color: $primary_color;
     position: relative;
 
-    .submenu{
+    .submenu {
         position: absolute;
         background-color: #ffffffe6;
         width: 100%;
@@ -76,9 +79,9 @@
     transition: transform 0.7s ease;
 }
 
-.boxCart{
+.boxCart {
     position: relative;
-    .quantity{
+    .quantity {
         position: absolute;
         top: -5px;
         right: -10px;
@@ -90,6 +93,5 @@
         @include radius_common(50%);
         color: white;
         font-size: 10px;
-
     }
 }

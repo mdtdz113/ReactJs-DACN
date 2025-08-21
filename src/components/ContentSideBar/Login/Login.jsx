@@ -9,6 +9,7 @@ import { register, signIn, getInfo } from '@/apis/authSercice';
 import Cookies from 'js-cookie';
 import { SideBarContext } from '@/context/SideBarProvider';
 import { StoreContext } from '@/context/storeProvider';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const { container, title, boxRememberMe, lostPw } = styles;
@@ -18,6 +19,7 @@ function Login() {
 
     const { setIsOpen, hangleGetListProductCart } = useContext(SideBarContext);
     const { setUserId } = useContext(StoreContext);
+    const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -25,14 +27,14 @@ function Login() {
         },
         validationSchema: Yup.object({
             email: Yup.string()
-                .email('Invalid email')
-                .required('Email is required'),
+                .email('Email không hợp lệ')
+                .required('Vui lòng nhập email'),
             password: Yup.string()
-                .min(6, 'Password must be at least 6 characters')
-                .required('Password is required'),
+                .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+                .required('Vui lòng nhập mật khẩu'),
             cfmpassword: Yup.string().oneOf(
                 [Yup.ref('password'), null],
-                'Passwords must match'
+                'Mật khẩu xác nhận không khớp'
             )
         }),
         onSubmit: async (values) => {
@@ -54,15 +56,25 @@ function Login() {
                 await signIn({ username, password })
                     .then((res) => {
                         setIsLoading(false);
-                        console.log(res.data);
-                        const { id, token, refreshToken } = res.data;
-                        setUserId(id);
-                        Cookies.set('userId', id);
-                        Cookies.set('token', token);
-                        Cookies.set('refreshToken', refreshToken);
-                        setIsOpen(false);
-                        hangleGetListProductCart(id, 'cart');
-                        toast.success(res.data.message);
+                        console.log(res.data.role);
+                        if (res.data.role === 'admin') {
+                            navigate('/admin');
+                            const { id, token, refreshToken } = res.data;
+                            Cookies.set('userId', id);
+                            Cookies.set('token', token);
+                            Cookies.set('refreshToken', refreshToken);
+                            setIsOpen(false);
+                        } else {
+                            const { id, token, refreshToken } = res.data;
+                            setUserId(id);
+                            Cookies.set('userId', id);
+                            Cookies.set('token', token);
+                            Cookies.set('refreshToken', refreshToken);
+                            setIsOpen(false);
+                            hangleGetListProductCart(id, 'cart');
+                            toast.success(res.data.message);
+                            window.location.reload();
+                        }
                     })
                     .catch((err) => {
                         setIsLoading(false);
@@ -78,7 +90,7 @@ function Login() {
 
     return (
         <div className={container}>
-            <div className={title}>{isRegister ? 'SIGN UP' : 'SIGN IN'}</div>
+            <div className={title}>{isRegister ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'}</div>
             <form onSubmit={formik.handleSubmit}>
                 <InputCommon
                     id='email'
@@ -90,7 +102,7 @@ function Login() {
 
                 <InputCommon
                     id='password'
-                    lable={'Password'}
+                    lable={'Mật khẩu'}
                     type={'password'}
                     isRequied
                     formik={formik}
@@ -99,7 +111,7 @@ function Login() {
                 {isRegister && (
                     <InputCommon
                         id='cfmpassword'
-                        lable={'Confirm Password'}
+                        lable={'Xác nhận mật khẩu'}
                         type={'password'}
                         isRequied
                         formik={formik}
@@ -109,11 +121,11 @@ function Login() {
                 {!isRegister && (
                     <div className={boxRememberMe}>
                         <input type='checkbox' />
-                        <span>Remember me</span>
+                        <span>Ghi nhớ đăng nhập</span>
                     </div>
                 )}
                 <MyButton
-                    content={isRegister ? 'REGISTER' : 'LOGIN'}
+                    content={isRegister ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'}
                     type={'submit'}
                     // onClick={() => toast.success('Đăng nhập thành công')}
                 />
@@ -121,15 +133,13 @@ function Login() {
                 <MyButton
                     content={
                         isRegister
-                            ? 'Already have a account?'
-                            : "Dont't have a account?"
+                            ? 'Bạn đã có tài khoản?'
+                            : 'Bạn chưa có tài khoản?'
                     }
                     type='submit'
                     onClick={handleToggle}
                 />
-                {!isRegister && (
-                    <div className={lostPw}>Lost your password</div>
-                )}
+                {!isRegister && <div className={lostPw}>Quên mật khẩu?</div>}
             </form>
         </div>
     );

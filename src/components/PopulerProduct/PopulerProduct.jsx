@@ -4,7 +4,7 @@ import ProductItem from '@components/ProductItem/ProductItem';
 
 function PopulerProduct({ data }) {
     const { container } = styles;
-    
+
     return (
         <>
             <MainLayout>

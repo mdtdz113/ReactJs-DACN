@@ -28,6 +28,18 @@ export const SideBarProvider = ({ children }) => {
                 });
         }
     };
+    const handleClearCart = () => {
+        setIsLoading(true);
+        deleteCart({ userId })
+            .then((res) => {
+                hangleGetListProductCart(userId, 'cart');
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error(error);
+                setIsLoading(false);
+            });
+    };
     const value = {
         isOpen,
         setIsOpen,
@@ -40,7 +52,8 @@ export const SideBarProvider = ({ children }) => {
         userId,
         detailsProduct,
         setDetailsProduct,
-        setListProductCart
+        setListProductCart,
+        handleClearCart
     };
     // useEffect(() => {
     //     hangleGetListProductCart(userId, 'cart');

@@ -1,0 +1,137 @@
+/* Layout tổng */
+.wrapper {
+    padding: 16px;
+    display: grid;
+    gap: 16px;
+}
+
+/* Cards & panel cơ bản */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.cardTitle {
+    margin: 4px 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* KPI grid */
+.kpiGrid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    width: 1300px;
+}
+
+.kpiCard {
+    @extend .card;
+    padding: 16px;
+}
+
+.kpiTitle {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.kpiValue {
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+/* Chart grid */
+.chartGrid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 2fr 1fr;
+    width: 1000px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.chartPanel {
+    @extend .card;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+    width: 700px;
+}
+
+.chartBody {
+    flex: 1;
+    min-height: 0; /* fix overflow in rechart's container */
+}
+
+/* Bottom grid */
+.bottomGrid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr 1fr;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Activity list */
+.activityList {
+    @extend .card;
+}
+
+.activityUl {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.activityItem {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 6px;
+}
+
+.activityWhen {
+    color: #6b7280;
+}
+
+/* Latest orders */
+.latestOrders {
+    @extend .card;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.theadRow {
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.tbodyRow {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.muted {
+    color: #6b7280;
+}
+
+/* Màu biểu đồ (Recharts có thể set trong JSX, giữ class dùng cho legend/custom nếu thêm) */
+.primary {
+    color: #2563eb;
+}
+.success {
+    color: #10b981;
+}

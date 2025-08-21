@@ -34,12 +34,12 @@ function CartTable({ listProductCart, getData, isLoading, getDataDelete }) {
             <table>
                 <thead>
                     <tr>
-                        <th>PRODUCT</th>
+                        <th>SẢN PHẨM</th>
                         <th></th>
-                        <th>PRICE</th>
-                        <th>SKU</th>
-                        <th>QUANTITY</th>
-                        <th>SUBTOTAL</th>
+                        <th>GIÁ</th>
+                        <th>MÃ SP</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>TẠM TÍNH</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,7 +63,7 @@ function CartTable({ listProductCart, getData, isLoading, getDataDelete }) {
                                     style={{ cursor: 'pointer' }}
                                 />
                             </td>
-                            <td>${item.price.toFixed(2)}</td>
+                            <td>{item.price.toFixed(2)} VND</td>
                             <td>{item.sku}</td>
                             <td>
                                 <SelectBox
@@ -80,7 +80,7 @@ function CartTable({ listProductCart, getData, isLoading, getDataDelete }) {
                                     defaultValue={item.quantity}
                                 />
                             </td>
-                            <td>${item.total.toFixed(2)}</td>
+                            <td>{item.total.toFixed(2)} VND</td>
                         </tr>
                     ))}
                 </tbody>

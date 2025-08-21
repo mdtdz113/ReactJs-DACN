@@ -7,17 +7,17 @@ export const OurShopContext = createContext();
 
 export const OurShopProvider = ({ children }) => {
     const sortOptions = [
-        { label: 'Default sorting', value: '0' },
-        { label: 'Sort by popularity', value: '1' },
-        { label: 'Sort by averahe rating', value: '2' },
-        { label: 'Sort by last test', value: '3' },
-        { label: 'Sort by price: low to high', value: '4' },
-        { label: 'Sort by price: high to low', value: '5' }
+        { label: 'Sắp xếp mặc định', value: '0' },
+        { label: 'Sắp xếp theo độ phổ biến', value: '1' },
+        { label: 'Sắp xếp theo đánh giá trung bình', value: '2' },
+        { label: 'Sắp xếp theo mới nhất', value: '3' },
+        { label: 'Sắp xếp theo giá: từ thấp đến cao', value: '4' },
+        { label: 'Sắp xếp theo giá: từ cao đến thấp', value: '5' }
     ];
     const showOptions = [
         { label: '8', value: '8' },
         { label: '12', value: '12' },
-        { label: 'ALL', value: 'all' }
+        { label: 'Tất cả', value: 'all' }
     ];
     const [sortId, setSortId] = useState('0');
     const [showId, setShowId] = useState('8');
@@ -51,6 +51,27 @@ export const OurShopProvider = ({ children }) => {
                 setIsLoading(false);
             });
     };
+    const fetchProducts = () => {
+        const query = {
+            sortType: sortId,
+            page: 1,
+            limit: showId
+        };
+        setIsLoading(true);
+        getProduct(query)
+            .then((res) => {
+                setProducts(res.contents); // thay vì nối vào mảng cũ
+                setPage(+res.page);
+                setTotal(res.total);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+            .finally(() => {
+                setIsLoading(false);
+                setIsLoadMore(false);
+            });
+    };
     const values = {
         sortOptions,
         showOptions,
@@ -61,7 +82,8 @@ export const OurShopProvider = ({ children }) => {
         isShowGrid,
         hangleLoadMore,
         total,
-        isLoadMore
+        isLoadMore,
+        fetchProducts
     };
 
     useEffect(() => {

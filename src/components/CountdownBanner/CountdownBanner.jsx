@@ -9,9 +9,9 @@ function CountdownBanner() {
             <div className={containerTimmer}>
                 <CountdownTimer targetDate={targetDate} />
             </div>
-            <div className={title}>The classics make a comeback</div>
+            <div className={title}>Những thiết kế kinh điển trở lại</div>
             <div className={boxBtn}>
-                <button className={btn}>Buy now</button>
+                <button className={btn}>Mua ngay</button>
             </div>
         </div>
     );

@@ -3,6 +3,9 @@ import styles from '../../styles.module.scss';
 import MyButtonWhist from '@components/Button/ButtonWhist';
 import { useContext } from 'react';
 import { SideBarContext } from '@/context/SideBarProvider';
+import { StepperContext } from '@/context/SteperProvider';
+import PaymentMethord from '@/pages/Cart/components/contents/PaymenMethord';
+import { useNavigate } from 'react-router-dom';
 
 function CartSummer() {
     const {
@@ -19,58 +22,47 @@ function CartSummer() {
         imageMethods,
         textSecure
     } = styles;
+    const navigate = useNavigate();
     const { listProductCart } = useContext(SideBarContext);
-
-    const srcMethods = [
-        'https://xstore.8theme.com/elementor2/marseille04/wp-content/themes/xstore/images/woocommerce/payment-icons/visa.jpeg',
-        'https://xstore.8theme.com/elementor2/marseille04/wp-content/themes/xstore/images/woocommerce/payment-icons/master-card.jpeg',
-        'https://xstore.8theme.com/elementor2/marseille04/wp-content/themes/xstore/images/woocommerce/payment-icons/paypal.jpeg',
-        'https://xstore.8theme.com/elementor2/marseille04/wp-content/themes/xstore/images/woocommerce/payment-icons/american-express.jpeg',
-        'https://xstore.8theme.com/elementor2/marseille04/wp-content/themes/xstore/images/woocommerce/payment-icons/maestro.jpeg',
-        'https://xstore.8theme.com/elementor2/marseille04/wp-content/themes/xstore/images/woocommerce/payment-icons/bitcoin.jpeg'
-    ];
+    const { setCurrentStep } = useContext(StepperContext);
 
     const total = listProductCart.reduce((acc, item) => {
         return acc + item.total;
     }, 0);
+
+    const handleProcessCheckOut = () => {
+        setCurrentStep(2);
+    };
+
+    const handleContinueShopping = () => {
+        navigate('/shop');
+    };
     return (
         <div className={containerRight}>
             <div className={containerSummary}>
-                <div className={title}> CART TOTALS</div>
+                <div className={title}> TỔNG GIỎ HÀNG</div>
                 <div className={textTali}></div>
                 <div className={boxTotal}>
-                    <div>Subtotal</div>
-                    <div>${total}</div>
+                    <div>Tạm tính</div>
+                    <div>{total} VND</div>
                 </div>
                 <div className={boxTotal1}>
-                    <div>TOTAL</div>
-                    <div>${total}</div>
+                    <div>TỔNG CỘNG</div>
+                    <div>{total} VND</div>
                 </div>
 
-                <MyButton content={'Proceed to Checkout'} />
+                <MyButton
+                    content={'Tiến hành thanh toán'}
+                    onClick={handleProcessCheckOut}
+                />
 
-                <MyButtonWhist content={'Continue Shopping'} />
+                <MyButtonWhist
+                    content={'Tiếp tục mua sắm'}
+                    onClick={handleContinueShopping}
+                />
             </div>
 
-            <div className={containermethods}>
-                <div className={titleMethods}>
-                    Guaranteed <span>safe</span> checkout
-                </div>
-
-                <div className={boxImageMethods}>
-                    {srcMethods.map((src, index) => {
-                        return (
-                            <img
-                                src={src}
-                                alt=''
-                                key={index}
-                                className={imageMethods}
-                            />
-                        );
-                    })}
-                </div>
-            </div>
-            <div className={textSecure}>Your Payment is 100% Secure</div>
+            <PaymentMethord />
         </div>
     );
 }

@@ -19,4 +19,24 @@ const getRelatedProduct = async (id) => {
     const res = await axiosClient.get(`/related-products/${id}`);
     return res.data.relatedProducts;
 };
-export { getProduct, getDetailProduct, getRelatedProduct };
+
+const AddProduct = async (data) => {
+    return await axiosClient.post('/product', data);
+};
+
+const deleteProduct = async (id) => {
+    return await axiosClient.delete(`/product/${id}`);
+};
+
+const updateProduct = async (id, data) => {
+    return await axiosClient.put(`/product/${id}`, data);
+};
+
+export {
+    getProduct,
+    getDetailProduct,
+    getRelatedProduct,
+    AddProduct,
+    deleteProduct,
+    updateProduct
+};

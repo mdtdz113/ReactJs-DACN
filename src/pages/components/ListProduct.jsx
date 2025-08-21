@@ -41,7 +41,8 @@ function ListProducts() {
                         </div>
 
                         {products.length < total && (
-                            <div className={btnLoading}
+                            <div
+                                className={btnLoading}
                                 style={{ width: '200px', margin: '50px auto' }}
                                 onClick={hangleLoadMore}
                             >
@@ -50,7 +51,7 @@ function ListProducts() {
                                         isLoadMore ? (
                                             <Loading />
                                         ) : (
-                                            'LOAD MORE PRODUCTS'
+                                            'Xem thêm sản phẩm'
                                         )
                                     }
                                 />

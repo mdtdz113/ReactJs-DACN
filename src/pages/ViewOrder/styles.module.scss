@@ -1,0 +1,128 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+
+.container {
+    padding-top: 87px;
+    .functionbox {
+        @include flex_box_custom(space-between, center, 0px);
+        color: $secondary_color;
+        font-size: 14px;
+        .specialText {
+            color: $primary_color;
+            font-weight: 400;
+        }
+        .btnBack {
+            cursor: pointer;
+        }
+    }
+
+    .BannerOrder {
+        padding-top: 10px;
+        padding-left: 5px;
+    }
+
+    .ListOrders {
+        // width: 100%;
+        margin: 0 auto;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e1e1e1;
+        position: relative;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 10px;
+
+            thead {
+                tr {
+                    th {
+                        padding: 10px 15px;
+                        border-bottom: 1px solid #ccc;
+                        font-size: 20px;
+                        font-weight: 300;
+                        // text-align: center;
+                    }
+
+                    th:first-child {
+                        padding-left: 0;
+                        text-align: left;
+                    }
+
+                    th:last-child {
+                        padding-right: 0;
+                        text-align: right;
+                    }
+                }
+            }
+
+            tbody {
+                tr {
+                    td {
+                        padding: 15px;
+                        vertical-align: top;
+                        color: $secondary_color;
+                        font-size: 14px;
+                        font-weight: 300;
+                        a {
+                            cursor: pointer;
+                            color: rgb(16, 3, 255);
+                        }
+                        &:nth-child(1) {
+                            display: flex;
+                            padding-left: 0;
+                            color: $four_color;
+                            font-size: 16px;
+
+                            img {
+                                width: calc(100px - 0.71em);
+                                margin-right: 10px;
+                                border-radius: 2px;
+                            }
+
+                            div {
+                                flex-grow: 1;
+
+                                p:first-child {
+                                    margin: 0;
+                                }
+
+                                p:last-child {
+                                    font-size: 0.9em;
+                                    color: #777;
+                                }
+                            }
+                        }
+                        &:nth-child(4) {
+                            color: $thr_color;
+                        }
+
+                        &:nth-child(5) {
+                            select {
+                                width: 100%;
+                                padding: 8px;
+                                border: 1px solid #ccc;
+                                border-radius: 1px;
+                                color: $secondary_color;
+                            }
+                        }
+
+                        &:last-child {
+                            text-align: right;
+                            padding-right: 0;
+                        }
+                    }
+                }
+            }
+        }
+        .loadingCart {
+            @include flex_box_custom(center, center, 0px);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(235, 235, 235, 0.5);
+        }
+    }
+}

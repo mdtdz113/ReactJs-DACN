@@ -196,13 +196,14 @@ function DetailProduct() {
                 <MainLayout>
                     <div className={functionbox}>
                         <div>
-                            Home &gt; <span className={specialText}>Shop</span>
+                            Trang chủ &gt;{' '}
+                            <span className={specialText}>Cửa hàng</span>
                         </div>
                         <div
                             className={btnBack}
                             onClick={() => navigate('/shop')}
                         >
-                            Return to previous page
+                            Quay lại trang trước
                         </div>
                     </div>
 
@@ -233,7 +234,7 @@ function DetailProduct() {
                                     <div className={TextSection}>
                                         <h1>{data?.name}</h1>
                                         <div className={priceText}>
-                                            ${data?.price}
+                                            {data?.price} VND
                                         </div>
                                         <p>{data?.description}</p>
                                         <div className={titleSize}>

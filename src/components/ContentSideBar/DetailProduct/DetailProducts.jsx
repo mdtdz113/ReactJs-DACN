@@ -84,7 +84,7 @@ function DetailProducts() {
         <div className={container}>
             <SliderCommon data={detailsProduct.images} />
             <div className={titleName}>{detailsProduct.name}</div>
-            <div className={titlePrice}>${detailsProduct.price}</div>
+            <div className={titlePrice}>{detailsProduct.price} VND</div>
             <p>{detailsProduct.description}</p>
             <span>Size {sizeChoose}</span>
             <div className={boxSize}>

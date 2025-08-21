@@ -46,7 +46,7 @@ function Cart() {
         >
             <HeaderSidebar
                 icon={<BsCart3 style={{ fontSize: '30px' }} />}
-                title={'Cart'}
+                title={'Giỏ hàng'}
             />
             {listProductCart.length ? (
                 <div className={containerListItem}>
@@ -78,25 +78,27 @@ function Cart() {
                     </div>
                     <div>
                         <div>
-                            <span>Subtotal:</span>
-                            <span>${subTotal.toFixed(2)}</span>
+                            <span>Tạm tính:</span>
+                            <span>{subTotal.toFixed(2)} VND</span>
                         </div>
                         <div className={btnWist}>
                             <MyButton
-                                content={'VIEW CART'}
+                                content={'XEM GIỎ HÀNG'}
                                 onClick={handleNavigate}
                             />
                         </div>
                         <div>
-                            <MyButtonWhist content={'CHECKOUT'} />
+                            <MyButtonWhist content={'THANH TOÁN'} />
                         </div>
                     </div>
                 </div>
             ) : (
                 <div className={boxEmpty}>
-                    <div className={des}>No products in the cart</div>
+                    <div className={des}>
+                        Không có sản phẩm nào trong giỏ hàng
+                    </div>
                     <div onClick={() => handleNavigateToShop()}>
-                        <MyButtonWhist content={'RETURN TO SHOP'} />
+                        <MyButtonWhist content={'ĐẾN CỬA HÀNG'} />
                     </div>
                 </div>
             )}

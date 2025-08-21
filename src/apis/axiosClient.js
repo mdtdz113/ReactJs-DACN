@@ -1,7 +1,8 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 const axiosClient = axios.create({
-    baseURL: 'https://be-project-reactjs.vercel.app/api/v1',
+    // baseURL: 'https://be-project-reactjs.vercel.app/api/v1',
+    baseURL: 'http://localhost:3000/api/v1',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json'

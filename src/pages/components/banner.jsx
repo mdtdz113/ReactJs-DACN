@@ -12,9 +12,9 @@ function Banner() {
                     <div>
                         <CountdownTimer targetDate={targetDate} />
                     </div>
-                    <div className={title}>The classics make a comeback</div>
+                    <div className={title}>Phong cách kinh điển trở lại</div>
                     <div className={btn}>
-                        <MyButton content={'Buy now'}/>
+                        <MyButton content={'Mua ngay'} />
                     </div>
                 </div>
             </div>

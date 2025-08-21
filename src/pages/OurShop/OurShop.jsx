@@ -24,14 +24,15 @@ function OurShop() {
                     <div className={functionbox}>
                         <div>
                             {' '}
-                            Home &gt; <span className={specialText}>Shop</span>
+                            Trang chủ &gt;{' '}
+                            <span className={specialText}>Cửa hàng</span>
                         </div>
                         <div
                             className={btnBack}
                             onClick={() => handleBackPreviousPage()}
                         >
                             {' '}
-                            Return to previous page{' '}
+                            Quay lại trang trước{' '}
                         </div>
                     </div>
                     <Banner />

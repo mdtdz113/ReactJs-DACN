@@ -1,0 +1,39 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+
+.container {
+    @include flex_box_custom(space-between, center, 0px);
+    height: 82px;
+    margin: 0;
+    background-color: antiquewhite;
+    .logoIma {
+        padding: 20px 40px;
+        img {
+            height: 30px;
+        }
+    }
+
+    .headerAdmin {
+        @include flex_box_custom(center, center, 20px);
+        padding: 20px 70px;
+
+        .logoAdmin {
+            img {
+                height: 50px;
+                cursor: pointer;
+            }
+        }
+        .adminSubmenu {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+
+            &:hover {
+                background: #fee2e2;
+            }
+        }
+    }
+}

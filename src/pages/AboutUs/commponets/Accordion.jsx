@@ -3,34 +3,34 @@ import styles from '../styles.module.scss';
 import cls from 'classnames';
 const data = [
     {
-        title: 'Feugiat purus mi nisl dolor pellentesque tellus?',
+        title: 'Sản phẩm có đảm bảo chất lượng không?',
         content:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+            'Tất cả sản phẩm của chúng tôi đều được kiểm tra kỹ lưỡng trước khi đến tay khách hàng. Chúng tôi cam kết về chất lượng, độ bền và sự thoải mái khi sử dụng.'
     },
     {
-        title: 'Suspendisse nunc sagittis adipiscing imperdiet turpis sodales massa convallis sit?',
+        title: 'Tôi có thể đổi trả sản phẩm trong bao lâu?',
         content:
-            'Sed felis eget velit aliquet sagittis id consectetur. Arcu non odio euismod lacinia at quis. Lectus nulla at volutpat diam ut venenatis tellus. Faucibus pulvinar elementum integer enim neque volutpat ac. Rhoncus dolor purus non enim praesent elementum facilisis. Integer enim neque volutpat ac tincidunt vitae semper. Volutpat consequat mauris nunc congue nisi vitae suscipit. Vitae suscipit tellus mauris a. Donec massa sapien faucibus et molestie ac feugiat sed. Id velit ut tortor pretium. Dui vivamus arcu felis bibendum. Mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Massa tincidunt dui ut ornare. Hendrerit dolor magna eget est lorem ipsum dolor sit amet.'
+            'Bạn có thể đổi hoặc trả sản phẩm trong vòng 14 ngày kể từ khi nhận hàng. Điều kiện sản phẩm còn nguyên tem mác, chưa qua sử dụng và giữ nguyên bao bì ban đầu.'
     },
     {
-        title: 'Facillisis adipiscing lacus, nisl at in consectetur in?',
+        title: 'Có hỗ trợ giao hàng tận nơi không?',
         content:
-            'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            'Chúng tôi hỗ trợ giao hàng tận nơi trên toàn quốc. Bạn có thể yên tâm đặt hàng và nhận sản phẩm ngay tại nhà.'
     },
     {
-        title: 'Feugiat purus mi nisl dolor pellentesque tellus?',
+        title: 'Phương thức thanh toán gồm những gì?',
         content:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+            'Khách hàng có thể lựa chọn nhiều hình thức thanh toán khác nhau như: thẻ tín dụng, chuyển khoản ngân hàng, ví điện tử hoặc thanh toán khi nhận hàng (COD).'
     },
     {
-        title: 'Suspendisse nunc sagittis adipiscing imperdiet turpis sodales massa convallis sit?',
+        title: 'Sản phẩm có bảo hành không?',
         content:
-            'Sed felis eget velit aliquet sagittis id consectetur. Arcu non odio euismod lacinia at quis. Lectus nulla at volutpat diam ut venenatis tellus. Faucibus pulvinar elementum integer enim neque volutpat ac. Rhoncus dolor purus non enim praesent elementum facilisis. Integer enim neque volutpat ac tincidunt vitae semper. Volutpat consequat mauris nunc congue nisi vitae suscipit. Vitae suscipit tellus mauris a. Donec massa sapien faucibus et molestie ac feugiat sed. Id velit ut tortor pretium. Dui vivamus arcu felis bibendum. Mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Massa tincidunt dui ut ornare. Hendrerit dolor magna eget est lorem ipsum dolor sit amet.'
+            'Một số dòng sản phẩm sẽ được áp dụng chính sách bảo hành. Chi tiết bảo hành sẽ được ghi rõ trong phần mô tả sản phẩm hoặc phiếu bảo hành kèm theo.'
     },
     {
-        title: 'Pellentesque egestas eget amet erat leo arcu?',
+        title: 'Tôi có thể liên hệ hỗ trợ bằng cách nào?',
         content:
-            'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+            'Bạn có thể liên hệ với chúng tôi qua hotline, email hoặc chat trực tiếp trên website. Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn 24/7.'
     }
 ];
 function Accordion() {

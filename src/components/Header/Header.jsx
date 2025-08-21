@@ -14,6 +14,7 @@ import { TfiReload } from 'react-icons/tfi';
 import { IoHeartOutline } from 'react-icons/io5';
 import { IoCartOutline } from 'react-icons/io5';
 import { StoreContext } from '@/context/storeProvider';
+import { useNavigate } from 'react-router-dom';
 function MyHeader() {
     const {
         containerHeader,
@@ -46,7 +47,11 @@ function MyHeader() {
         setIsOpen(true);
         setType(type);
     };
+    const navigate = useNavigate();
 
+    const handleNavigate = (href) => {
+        navigate(href);
+    };
     useEffect(() => {
         if (scrollPosition > 80) {
             setFixedPosition(true);
@@ -89,6 +94,7 @@ function MyHeader() {
                         src={logo}
                         alt='logo'
                         style={{ width: '153px', height: '53px' }}
+                        onClick={() => handleNavigate('/')}
                     />
                 </div>
                 <div className={containerBox}>

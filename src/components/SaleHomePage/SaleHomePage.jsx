@@ -12,16 +12,13 @@ function SaleHomePage() {
                 />
             </div>
             <div>
-                <h1 className={title}>Sale of the year</h1>
-                <span className={des}>
-                    Libero sed faucibus facilisis fermentum. Est nibh sed massa
-                    sodales.
-                </span>
+                <h1 className={title}>Đại giảm giá lớn nhất trong năm</h1>
+                <span className={des}>Đừng bỏ lỡ cơ hội vàng trong năm.</span>
                 <div className={boxBtn}>
-                    <MyButton content={'Read more'} />
+                    <MyButton content={'Xem thêm'} />
                 </div>
             </div>
-            <div className={boxImage} >
+            <div className={boxImage}>
                 <img
                     src='https://xstore.b-cdn.net/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image_2.jpeg'
                     alt=''

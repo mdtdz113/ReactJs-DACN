@@ -1,0 +1,22 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    .lableClass {
+        font-size: 14p;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    input {
+        height: 37px;
+
+        padding: 0 15px;
+    }
+
+    select {
+        height: 37px;
+
+        padding: 0 15px;
+    }
+}

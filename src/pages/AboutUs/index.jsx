@@ -30,15 +30,15 @@ function AboutUs() {
     const textImage = [
         {
             src: 'https://xstore.b-cdn.net/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image-min.jpg',
-            des: 'Ac eget cras augue nisi neque lacinia in aliquam. Odio pellentesque sed ultrices dolor amet nunc habitasse proin consec. tur feugiat egestas eget.'
+            des: 'Tại Marseille04, chúng tôi tin rằng mỗi bộ trang phục không chỉ đơn thuần là quần áo, mà còn là cách để thể hiện cá tính và phong cách riêng của bạn. Với niềm đam mê thời trang và sự tỉ mỉ trong từng chi tiết, chúng tôi luôn nỗ lực mang đến cho khách hàng những sản phẩm chất lượng, hiện đại và phù hợp với xu hướng mới nhất.'
         },
         {
             src: 'https://xstore.b-cdn.net/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image-copy-2-min.jpg',
-            des: 'Arcu volutpat sollicitudin sapien sit justo tellus eu fames aenean. Faucibus at eu nulla adipiscing. Ipsum a morbi tortor ullamcorper sit semper.'
+            des: 'Chúng tôi lựa chọn nguyên liệu một cách kỹ lưỡng, từ chất liệu vải mềm mại, thoáng mát cho đến những đường kim mũi chỉ chắc chắn, đảm bảo sự thoải mái và bền bỉ trong quá trình sử dụng. Mỗi sản phẩm đều được đội ngũ thiết kế và sản xuất kiểm tra nghiêm ngặt, nhằm mang đến cho khách hàng sự an tâm tuyệt đối khi mua sắm.'
         },
         {
             src: 'https://xstore.b-cdn.net/elementor2/marseille04/wp-content/uploads/sites/2/2022/12/Image-copy-min.jpg',
-            des: 'Nibh luctus eu dignissim sit. Lorem netus ultrices neque elementum. Et convallis consectetur lacus luctus iaculis quisque sed.'
+            des: 'Không chỉ dừng lại ở sản phẩm, Marseille04 còn mong muốn mang đến trải nghiệm mua sắm tốt nhất. Từ việc đặt hàng trực tuyến dễ dàng, thanh toán an toàn, cho đến chính sách đổi trả linh hoạt và dịch vụ hỗ trợ 24/7 – tất cả đều được xây dựng để đồng hành cùng khách hàng trên hành trình lựa chọn thời trang.'
         }
     ];
     return (
@@ -50,24 +50,26 @@ function AboutUs() {
                     <div className={functionbox}>
                         <div>
                             {' '}
-                            Home &gt;{' '}
-                            <span className={specialText}>About us</span>
+                            Trang chủ &gt;{' '}
+                            <span className={specialText}>Giới thiệu</span>
                         </div>
                         <div
                             className={btnBack}
                             onClick={() => handleBackPreviousPage()}
                         >
                             {' '}
-                            Return to previous page{' '}
+                            Quay lại trang trước{' '}
                         </div>
                     </div>
 
                     <div className={BannerText}>
                         <div className={line} />
                         <div className={textContainer}>
-                            <p className={subtitle}>WE TRY OUR BEST FOR YOU</p>
+                            <p className={subtitle}>
+                                CHÚNG TÔI LUÔN NỖ LỰC VÌ BẠN
+                            </p>
                             <h2 className={title}>
-                                Welcome to the Marseille04 Shop
+                                Chào mừng bạn đến với cửa hàng Marseille04
                             </h2>
                         </div>
                         <div className={line} />
@@ -93,8 +95,10 @@ function AboutUs() {
                     <div className={BannerText}>
                         <div className={line} />
                         <div className={textContainer}>
-                            <p className={subtitle}>we are happy to help you</p>
-                            <h2 className={title}>Have Any Questions?</h2>
+                            <p className={subtitle}>
+                                Luôn sẵn sàng giải đáp thắc mắc của bạn
+                            </p>
+                            <h2 className={title}>Bạn có câu hỏi nào không?</h2>
                         </div>
                         <div className={line} />
                     </div>

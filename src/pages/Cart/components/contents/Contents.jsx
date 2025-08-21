@@ -103,7 +103,7 @@ function Contents() {
                             <div className={boxCoupon}>
                                 <input
                                     type='text'
-                                    placeholder='Enter coupon code'
+                                    placeholder='Nhập mã giảm giá'
                                 />
                                 <div className={btnCoupon}>
                                     <MyButtonWhist content={'OK'} />
@@ -111,7 +111,7 @@ function Contents() {
                             </div>
                             <div>
                                 <MyButton
-                                    content={'Clear Shopping Cart'}
+                                    content={'Xóa tất cả giỏ hàng'}
                                     onClick={handleClearCart}
                                 />
                             </div>
@@ -132,7 +132,7 @@ function Contents() {
                     <div>
                         {' '}
                         <MyButton
-                            content={'RETURN TO SHOP'}
+                            content={'ĐẾN CỬA HÀNG'}
                             onClick={() => handleNavigateToShop()}
                         />
                     </div>

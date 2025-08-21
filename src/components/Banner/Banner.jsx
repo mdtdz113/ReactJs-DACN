@@ -6,14 +6,13 @@ function Banner() {
         <div className={container}>
             <div className={content}>
                 <div>
-                    <h1>XStore Marseille04 Demo</h1>
+                    <h1>XStore Marseille04</h1>
                 </div>
                 <div>
-                    Make yours celebrations even more special this years with
-                    beautiful.
+                    Cùng XStore tạo nên những khoảnh khắc lễ hội thật đặc biệt.
                 </div>
                 <div>
-                    <button className={btn}>Go to shop</button>
+                    <button className={btn}>Đi đến cửa hàng</button>
                 </div>
             </div>
         </div>

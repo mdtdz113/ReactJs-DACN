@@ -4,23 +4,23 @@ import box from '@icons/svgs/box.svg';
 import chat from '@icons/svgs/chat.svg';
 export const dataInfo = [
     {
-        title: 'Fastest Shipping',
-        description: 'Order at $39 order',
+        title: 'Giao hàng nhanh chóng',
+        description: 'Miễn phí cho đơn từ 1.000.000 VND',
         src: truck
     },
     {
-        title: '100% Safe Payments',
-        description: '9 month installments',
+        title: 'Thanh toán an toàn 100%',
+        description: 'Trả góp 9 tháng',
         src: card
     },
     {
-        title: '14-Days Return',
-        description: 'Shop with confidence',
+        title: 'Đổi trả trong 14 ngày',
+        description: 'Mua sắm tự tin',
         src: box
     },
     {
-        title: '24/7 Online Support',
-        description: 'Delivered to home',
+        title: 'Hỗ trợ trực tuyến 24/7',
+        description: 'Giao tận nhà, tận tâm phục vụ',
         src: chat
-    },
+    }
 ];

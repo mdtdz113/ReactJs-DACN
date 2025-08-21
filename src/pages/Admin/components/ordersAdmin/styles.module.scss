@@ -1,0 +1,173 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+
+.topBar {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 16px;
+    flex-wrap: wrap;
+}
+
+.statusBtn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}
+
+.statusBtnActive {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.actionsCell {
+    white-space: nowrap;
+}
+
+.confirmLink {
+    margin-right: 12px;
+    color: #2563eb;
+    cursor: pointer;
+}
+
+.deleteLink {
+    color: #dc2626;
+    cursor: pointer;
+}
+
+.badgePending {
+    color: #374151;
+    background: #e5e7eb;
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+.badgeProcessing {
+    color: #1d4ed8;
+    background: #dbeafe;
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+.badgeShipped {
+    color: #6d28d9;
+    background: #ede9fe;
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+.badgeDelivered {
+    color: #059669;
+    background: #d1fae5;
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+.badgeCancelled {
+    color: #b91c1c;
+    background: #fee2e2;
+    padding: 2px 8px;
+    border-radius: 9999px;
+}
+
+.ListOrders {
+    // width: 100%;
+    margin: 0 auto;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e1e1;
+    position: relative;
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        margin-top: 10px;
+
+        thead {
+            tr {
+                th {
+                    padding: 10px 15px;
+                    border-bottom: 1px solid #ccc;
+                    font-size: 20px;
+                    font-weight: 300;
+                    // text-align: center;
+                }
+
+                th:first-child {
+                    padding-left: 0;
+                    text-align: left;
+                }
+
+                th:last-child {
+                    padding-right: 0;
+                    text-align: right;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                td {
+                    padding: 15px;
+                    vertical-align: top;
+                    color: $secondary_color;
+                    font-size: 14px;
+                    font-weight: 300;
+                    a {
+                        cursor: pointer;
+                        color: rgb(16, 3, 255);
+                    }
+                    &:nth-child(1) {
+                        display: flex;
+                        padding-left: 0;
+                        color: $four_color;
+                        font-size: 16px;
+
+                        img {
+                            width: calc(100px - 0.71em);
+                            margin-right: 10px;
+                            border-radius: 2px;
+                        }
+
+                        div {
+                            flex-grow: 1;
+
+                            p:first-child {
+                                margin: 0;
+                            }
+
+                            p:last-child {
+                                font-size: 0.9em;
+                                color: #777;
+                            }
+                        }
+                    }
+                    &:nth-child(4) {
+                        color: $thr_color;
+                    }
+
+                    &:nth-child(5) {
+                        select {
+                            width: 100%;
+                            padding: 8px;
+                            border: 1px solid #ccc;
+                            border-radius: 1px;
+                            color: $secondary_color;
+                        }
+                    }
+
+                    &:last-child {
+                        text-align: right;
+                        padding-right: 0;
+                    }
+                }
+            }
+        }
+    }
+    .loadingCart {
+        @include flex_box_custom(center, center, 0px);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(235, 235, 235, 0.5);
+    }
+}

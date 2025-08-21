@@ -1,0 +1,256 @@
+:root {
+    --bg: #ffffff;
+    --card: #ffffff;
+    --muted: #9699a3;
+    --text: #000000;
+    --primary: #4e8cff;
+    --primary-600: #3a72d9;
+    --danger: #ef4444;
+    --danger-600: #dc2626;
+    --ring: #263044;
+    --border: #1c2230;
+    --success: #10b981;
+    --warning: #f59e0b;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.page {
+    padding: clamp(16px, 2vw, 24px);
+    color: var(--text);
+    background: var(--bg);
+    min-height: 100%;
+    
+}
+
+.pageHeader {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.pageTitle {
+    margin: 0;
+    font-size: clamp(18px, 2.2vw, 24px);
+    font-weight: 700;
+}
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.searchInput {
+    width: min(420px, 90vw);
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    transition:
+        box-shadow 0.2s,
+        border-color 0.2s;
+}
+.searchInput:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+.addForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr minmax(140px, 180px) auto;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+@media (max-width: 100%) {
+    .addForm {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text);
+    outline: none;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+.input:focus,
+.select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+.btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+        transform 0.05s ease,
+        background 0.2s,
+        border-color 0.2s;
+}
+.btn:hover {
+    background: #131826;
+}
+.btn:active {
+    transform: translateY(1px);
+}
+.btnPrimary {
+    background: var(--primary);
+    border-color: var(--primary-600);
+    color: white;
+}
+.btnPrimary:hover {
+    background: var(--primary-600);
+}
+.btnGhost {
+    background: transparent;
+}
+.btnDanger {
+    background: var(--danger);
+    border-color: var(--danger-600);
+    color: white;
+}
+.btnDanger:hover {
+    background: var(--danger-600);
+}
+
+.tableWrap {
+    background: transparent;
+}
+
+.table {
+    width: 1300px;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+}
+.thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    padding: 12px;
+    background: #0f131b;
+    border-bottom: 1px solid var(--border);
+}
+.tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #0e1219;
+    color: var(--muted);
+}
+.tagLocked {
+    background: color-mix(in oklab, var(--danger) 20%, #0e1219);
+    color: #ffdcdc;
+    border-color: color-mix(in oklab, var(--danger) 40%, var(--border));
+}
+.tagOpen {
+    background: color-mix(in oklab, var(--success) 20%, #0e1219);
+    color: #dcffef;
+    border-color: color-mix(in oklab, var(--success) 40%, var(--border));
+}
+
+.empty,
+.hint {
+    color: var(--muted);
+    padding: 16px 0;
+    text-align: center;
+}
+
+.footer {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+}
+.pagination {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.pageBtn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.pageBtnActive {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+/* Mobile cards (ẩn table ở màn nhỏ) */
+.cardList {
+    display: none;
+}
+@media (max-width: 1000px) {
+    .table {
+        display: none;
+    }
+    .cardList {
+        display: grid;
+        gap: 12px;
+    }
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+}
+.cardRow {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+}
+.cardRow:last-child {
+    border-bottom: none;
+}
+.cardActions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}

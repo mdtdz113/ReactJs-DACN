@@ -8,7 +8,7 @@
 }
 
 .headline {
-    width: 100%;
+    width: 60%;
     height: 2px;
     border-top: 1px solid #e1e1e1;
     border-bottom: 1px solid #e1e1e1;
@@ -17,7 +17,7 @@
 
 .containerMiddleBox {
     @include flex_box_custom(center, center, 0px);
-    width: 60%;
+    width: 80%;
     padding: 0px 50px;
     flex-direction: column;
     line-height: 0px;

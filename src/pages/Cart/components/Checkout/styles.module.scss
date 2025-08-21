@@ -1,0 +1,72 @@
+@use '@styles/mixin.module.scss' as *;
+@use '@styles/variables.module.scss' as *;
+
+.container {
+    @include flex_box_custom(space-between, space-between, 0px);
+
+    .leftbody {
+        flex-grow: 1;
+        .row {
+            margin-bottom: 20px;
+        }
+
+        .row2colum {
+            display: flex;
+            gap: 20px;
+        }
+    }
+
+    .rightbody {
+        max-width: 400px;
+        height: 660px;
+        width: 100%;
+        margin-left: 20px;
+        border: 2px solid #333;
+        padding: 15px 25px;
+
+        .title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .Items {
+            height: 200px;
+            overflow-y: scroll;
+            border-top: 1px solid #6c6b6b;
+            padding: 20px 0px;
+            .Item {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                img {
+                    width: 70px;
+                    height: 100px;
+                }
+                p {
+                    margin: 10px;
+                }
+            }
+        }
+
+        .totalPrice {
+            display: flex;
+            justify-content: space-between;
+            p {
+                font-size: 18px;
+                color: #000000;
+                font-weight: 600;
+                padding: 20px 0;
+            }
+        }
+
+        .checkBtn {
+            .btnCheckOn {
+                margin: 10px 0;
+
+                input {
+                    margin: 0 10px;
+                }
+            }
+        }
+    }
+}

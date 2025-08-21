@@ -52,7 +52,11 @@ function ProductItem({
     } = styles;
 
     const hangleChooseSize = (size) => {
-        setSizeChoose(size);
+        if (sizeChoose === size) {
+            setSizeChoose('');
+        } else {
+            setSizeChoose(size);
+        }
     };
     const hangleChooseClear = () => {
         setSizeChoose('');
@@ -67,7 +71,7 @@ function ProductItem({
     }, [isHomePage, ourShopStore?.isShowGrid]);
 
     const hangleAddToCart = () => {
-       handleAddProductToCartCommon(
+        handleAddProductToCartCommon(
             userId,
             setIsOpen,
             setType,
@@ -92,7 +96,7 @@ function ProductItem({
     };
 
     useEffect(() => {
-        if(slideItem) setIsShowGrid(true);
+        if (slideItem) setIsShowGrid(true);
     }, [slideItem]);
     return (
         <div className={isShowGrid ? '' : containerItem}>
@@ -145,14 +149,14 @@ function ProductItem({
                         })}
                     </div>
                 )}
-                {sizeChoose && (
+                {/* {sizeChoose && (
                     <div
                         className={btnClear}
                         onClick={() => hangleChooseClear()}
                     >
                         Clear
                     </div>
-                )}
+                )} */}
                 <div
                     className={cls(title, {
                         [textCenter]: !isHomePage
@@ -166,7 +170,7 @@ function ProductItem({
                         [textCenter]: !isHomePage
                     })}
                 >
-                    ${price}
+                    {price} VND
                 </div>
                 {!isHomePage && (
                     <div
@@ -175,7 +179,7 @@ function ProductItem({
                         })}
                     >
                         <MyButton
-                            content={isLoading ? <Loading /> : 'ADD TO CART'}
+                            content={isLoading ? <Loading /> : 'Thêm vào giỏ hàng'}
                             onClick={() => hangleAddToCart()}
                         />
                     </div>

@@ -1,0 +1,59 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+
+    .containerRight {
+        .BorderBox {
+            border: 2px solid #555;
+            padding: 20px 15px;
+            .contentIagme {
+                display: flex;
+                justify-content: flex-start;
+                .itemIagme {
+                    margin-right: 10px;
+                    img {
+                        width: 50px;
+                        object-fit: cover;
+                        border-radius: 50%;
+                    }
+                }
+                .itemIagmeText {
+                    font-size: 18px;
+                    font-weight: 800;
+                }
+
+                p {
+                    margin: 0;
+                }
+            }
+
+            .contentText {
+                display: flex;
+                justify-content: space-between;
+                padding: 20px 0;
+                border-bottom: 1px solid #555;
+                .titleName {
+                    font-size: 16px;
+                    color: #555;
+                }
+
+                .titleDes {
+                    font-size: 20px;
+                    color: #333;
+                    font-weight: 800;
+                }
+                .titleNameND {
+                    font-size: 12px;
+                    color: #555;
+                    margin-left: 30px;
+                }
+            }
+        }
+    }
+
+    .containerLeft{
+        justify-content: center;
+        align-items: center;
+        
+    }
+}

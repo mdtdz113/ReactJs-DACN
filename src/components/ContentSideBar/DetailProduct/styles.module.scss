@@ -3,6 +3,8 @@
 
 .container {
     padding: 20px;
+    height: 100%;
+    overflow-y: scroll;
 
     .titleName {
         font-size: 24px;
