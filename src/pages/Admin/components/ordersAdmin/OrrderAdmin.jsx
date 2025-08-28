@@ -27,7 +27,13 @@ function OrderAdmin() {
     const fetchOrders = async (status) => {
         setLoading(true);
         try {
-            const { data } = await getAllOrderAdmin(token, { status });
+            let queryStatus = status;
+            if (status === 'pending') {
+                queryStatus = ['pending', 'completed'];
+            }
+            const { data } = await getAllOrderAdmin(token, {
+                status: queryStatus
+            });
             setOrders(data?.data || []);
         } finally {
             setLoading(false);
@@ -43,7 +49,7 @@ function OrderAdmin() {
             case 'pending':
                 return <span className={badgePending}>Chờ xử lý</span>;
             case 'completed':
-                return <span>Đã thanh toán</span>; // nếu bạn giữ trạng thái này
+                return <span className={badgePending}>Đã thanh toán</span>;
             case 'processing':
                 return <span className={badgeProcessing}>Đang xử lý</span>;
             case 'shipped':
@@ -118,6 +124,7 @@ function OrderAdmin() {
         []
     );
 
+    console.log(orders);
     return (
         <div>
             <div className={topBar}>
@@ -132,6 +139,30 @@ function OrderAdmin() {
                         {t.label}
                     </button>
                 ))}
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                    <button
+                        type='button'
+                        onClick={() =>
+                            window.open(
+                                '/admin/orders/invoices?status=completed',
+                                '_blank'
+                            )
+                        }
+                    >
+                        Đã thanh toán
+                    </button>
+                    <button
+                        type='button'
+                        onClick={() =>
+                            window.open(
+                                '/admin/orders/invoices?status=pending',
+                                '_blank'
+                            )
+                        }
+                    >
+                        Chưa thanh toán
+                    </button>
+                </div>
             </div>
 
             <div className={ListOrders}>
@@ -165,7 +196,6 @@ function OrderAdmin() {
                                         {nextStatusForConfirm(item.status) && (
                                             <button
                                                 className={confirmLink}
-                                                type='button'
                                                 onClick={() =>
                                                     handleConfirm(item)
                                                 }

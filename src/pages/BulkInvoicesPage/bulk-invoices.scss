@@ -1,0 +1,150 @@
+.bulk-wrap {
+    padding: 16px;
+    background: #f6f7f9;
+    min-height: 100vh;
+}
+
+.no-print.toolbar {
+    margin-bottom: 12px;
+    button {
+        padding: 8px 12px;
+        border: 1px solid #d0d7de;
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        &:active {
+            transform: scale(0.98);
+        }
+    }
+}
+
+/* Mỗi hóa đơn 1 trang */
+.invoice.a4 {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 12px;
+    background: #fff;
+    color: #111;
+    padding: 18mm 16mm;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    page-break-after: always; /* cũ */
+    break-after: page; /* mới */
+}
+
+.inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    h1 {
+        margin: 0 0 6px;
+        font-size: 20px;
+    }
+    p {
+        margin: 2px 0;
+    }
+    .inv-brand {
+        text-align: right;
+        .brand-name {
+            font-weight: 700;
+        }
+    }
+}
+
+.inv-parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    .party {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: #fff;
+    }
+    .party-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+}
+
+.inv-items {
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+    th,
+    td {
+        border: 1px solid #e5e7eb;
+        padding: 8px;
+        vertical-align: top;
+    }
+    th {
+        background: #f8fafc;
+    }
+    td:nth-child(3),
+    td:nth-child(4),
+    td:nth-child(5),
+    th:nth-child(3),
+    th:nth-child(4),
+    th:nth-child(5) {
+        text-align: right;
+    }
+}
+
+.inv-total {
+    margin-left: auto;
+    width: 300px;
+    .total-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+    }
+    .grand {
+        border-top: 1px dashed #d1d5db;
+        margin-top: 6px;
+        padding-top: 8px;
+        font-weight: 700;
+    }
+}
+
+.inv-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    div {
+        width: 40%;
+        text-align: center;
+        min-height: 80px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+}
+
+/* cấu hình in */
+@page {
+    size: A4;
+    margin: 10mm;
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    .bulk-wrap {
+        background: #fff;
+        padding: 0;
+    }
+    .invoice.a4 {
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+        break-after: page;
+    }
+}

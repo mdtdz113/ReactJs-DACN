@@ -36,6 +36,11 @@ const routers = [
     {
         path: '/ViewOrder',
         component: lazy(() => import('@pages/ViewOrder/'))
+    },
+
+    {
+        path: '/admin/orders/invoices',
+        component: lazy(() => import('@pages/BulkInvoicesPage'))
     }
 ];
 

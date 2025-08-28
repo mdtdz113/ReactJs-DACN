@@ -189,6 +189,7 @@ function DetailProduct() {
             hangleGetListProductCart
         );
     };
+
     return (
         <div>
             <MyHeader />

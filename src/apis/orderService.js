@@ -1,7 +1,9 @@
 import axiosClient from './axiosClient';
 
 // user
-export const creactOrder = async (data) => axiosClient.post('/orders', data);
+export const creactOrder = async (data) => {
+    return await axiosClient.post(`/orders`, data);
+};
 export const getDetailOrder = async (id) => axiosClient.get(`/orders/${id}`);
 export const getAllOrder = async (token) =>
     axiosClient.get('/orders', {

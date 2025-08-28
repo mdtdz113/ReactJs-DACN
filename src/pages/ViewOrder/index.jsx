@@ -9,6 +9,7 @@ import MyFooter from '@components/Footer/Footer';
 import { getOrderById } from '@/apis/orderService';
 import DetaiOrder from '@/pages/ViewOrder/components/DetailOrder';
 import { deleteOrder } from '@/apis/orderService';
+import { a } from 'caniuse-lite/dist/lib/supported';
 
 function ViewOrder() {
     const {
@@ -130,6 +131,12 @@ function ViewOrder() {
                                                         <span>Chờ xử lý</span>
                                                     )}
                                                     {item.status ===
+                                                        'completed' && (
+                                                        <span>
+                                                            Đã thanh toán
+                                                        </span>
+                                                    )}
+                                                    {item.status ===
                                                         'processing' && (
                                                         <span>Đang xử lý</span>
                                                     )}
@@ -159,17 +166,23 @@ function ViewOrder() {
                                                         Xem chi tiết
                                                     </a>
                                                 </td>
-                                                <td>
-                                                    <a
-                                                        onClick={() =>
-                                                            deleteOrderById(
-                                                                item._id
-                                                            )
-                                                        }
-                                                    >
-                                                        Xóa
-                                                    </a>
-                                                </td>
+                                                {item.status === 'pending' ? (
+                                                    <td>
+                                                        <a
+                                                            onClick={() =>
+                                                                deleteOrderById(
+                                                                    item._id
+                                                                )
+                                                            }
+                                                        >
+                                                            Xóa
+                                                        </a>
+                                                    </td>
+                                                ) : (
+                                                    <td>
+                                                        <a>*</a>
+                                                    </td>
+                                                )}
                                             </tr>
                                         ))}
                                     </tbody>

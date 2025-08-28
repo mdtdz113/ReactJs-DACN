@@ -20,11 +20,14 @@
         @include flex_box_custom(unset, flex-start, 0px);
 
         .imgSection {
-            max-width: 610px;
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            // max-width: 610px;
+            // width: 100%;
+            // display: flex;
+            // flex-wrap: wrap;
+            // gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); // 2 ảnh mỗi dòng
+            gap: 16px;
             img {
                 width: calc(100% / 2 - 10px);
                 height: 350px;
