@@ -2,7 +2,7 @@ import MyHeader from '@components/Header/Header';
 import MainLayout from '@components/Layout/Layout';
 import styles from './styles.module.scss';
 import { useNavigate } from 'react-router-dom';
-import Banner from '@components/Banner';
+import Banner from '@components/Banner/Banner';
 import { OurShopProvider } from '@/context/OurShopProvider';
 import { useContext } from 'react';
 import Filter from '@/pages/components/Filter';
