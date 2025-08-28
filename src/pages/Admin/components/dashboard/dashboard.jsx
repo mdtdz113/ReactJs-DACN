@@ -3,6 +3,7 @@ import Cookies from 'js-cookie';
 import { OurShopContext } from '@/context/OurShopProvider';
 import { getAllUser } from '@/apis/authSercice';
 import { getAllOrderAdmin } from '@/apis/orderService';
+import { getDetailProduct } from '@/apis/productServer';
 import { getActivities } from '@/utils/auditLog';
 
 import {
@@ -17,45 +18,126 @@ import {
     Bar
 } from 'recharts';
 
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import styles from './styles.module.scss';
 
+// =========================
+// Utils
+// =========================
 function formatVND(n) {
     return (Number(n) || 0).toLocaleString('vi-VN');
 }
 
-function sumByDay(orders = []) {
+// Cache tên sản phẩm
+const productNameCache = new Map();
+
+async function fetchProductName(productId) {
+    if (!productId) return null;
+    if (productNameCache.has(productId)) return productNameCache.get(productId);
+    try {
+        const res = await getDetailProduct(productId);
+        const name =
+            res?.data?.name ??
+            res?.data?.data?.name ??
+            res?.name ??
+            res?.title ??
+            res?.productName ??
+            null;
+        productNameCache.set(productId, name || null);
+        return name || null;
+    } catch {
+        productNameCache.set(productId, null);
+        return null;
+    }
+}
+
+async function attachProductNames(orders) {
+    const ids = Array.from(
+        new Set(
+            orders.flatMap((o) =>
+                (Array.isArray(o.items) ? o.items : [])
+                    .map((it) => it?.productId)
+                    .filter(Boolean)
+            )
+        )
+    );
+    await Promise.all(ids.map((id) => fetchProductName(id)));
+    return orders.map((o) => ({
+        ...o,
+        items: (Array.isArray(o.items) ? o.items : []).map((it) => ({
+            ...it,
+            name: it?.name ?? productNameCache.get(it?.productId) ?? null
+        }))
+    }));
+}
+
+// =========================
+// Grouping functions
+// =========================
+function groupRevenue(orders, filterType, startDate, endDate) {
     const m = new Map();
     for (const o of orders) {
         if (o?.status !== 'delivered') continue;
         const d = new Date(o.createdAt || o.updatedAt || Date.now());
-        const key = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-            .toISOString()
-            .slice(0, 10);
+        let key = '';
+
+        if (filterType === 'day') key = d.toLocaleDateString('vi-VN');
+        else if (filterType === 'month')
+            key = `${d.getMonth() + 1}/${d.getFullYear()}`;
+        else if (filterType === 'year') key = `${d.getFullYear()}`;
+        else key = d.toLocaleDateString('vi-VN');
+
+        if (filterType === 'custom' && startDate && endDate) {
+            if (d < startDate || d > endDate) continue;
+        }
+
         const amount = Number(o.totalAmount || o.amounts?.grandTotal || 0);
         m.set(key, (m.get(key) || 0) + amount);
     }
-    const days = [];
-    for (let i = 29; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const key = d.toISOString().slice(0, 10);
-        days.push({ date: key, revenue: m.get(key) || 0 });
-    }
-    return days;
+    return Array.from(m.entries()).map(([date, revenue]) => ({
+        date,
+        revenue
+    }));
 }
 
-function topProductsFromOrders(orders = [], topN = 5) {
+function revenueByMonth(orders, filterType, startDate, endDate) {
+    const m = new Map();
+    for (const o of orders) {
+        if (o?.status !== 'delivered') continue;
+        const d = new Date(o.createdAt || o.updatedAt);
+        if (filterType === 'custom' && startDate && endDate) {
+            if (d < startDate || d > endDate) continue;
+        }
+        const ymKey =
+            filterType === 'year'
+                ? `${d.getFullYear()}`
+                : `${d.getMonth() + 1}/${d.getFullYear()}`;
+        const amount = Number(o.totalAmount || o.amounts?.grandTotal || 0);
+        m.set(ymKey, (m.get(ymKey) || 0) + amount);
+    }
+    return Array.from(m.entries()).map(([date, revenue]) => ({
+        date,
+        revenue
+    }));
+}
+
+function topProductsFiltered(orders, filterType, startDate, endDate, topN = 5) {
     const count = new Map();
     for (const o of orders) {
+        if (o?.status !== 'delivered') continue;
+        const d = new Date(o.createdAt || o.updatedAt);
+        if (filterType === 'custom' && startDate && endDate) {
+            if (d < startDate || d > endDate) continue;
+        }
         for (const it of o.items || []) {
             const pid = it.productId || it.product || it._id;
             const qty = Number(it.qty || it.quantity || it.amount || 0);
             if (!pid || !qty) continue;
-            const name =
-                it.name || it.productName || `#${String(pid).slice(-6)}`;
+            const name = it.name || `Sản phẩm ${String(pid).slice(-6)}`;
             const prev = count.get(pid) || { name, qty: 0 };
             prev.qty += qty;
-            prev.name = prev.name || name;
+            prev.name = name;
             count.set(pid, prev);
         }
     }
@@ -64,6 +146,9 @@ function topProductsFromOrders(orders = [], topN = 5) {
         .slice(0, topN);
 }
 
+// =========================
+// Component
+// =========================
 export default function Dashboard() {
     const token = Cookies.get('token');
     const {
@@ -76,19 +161,31 @@ export default function Dashboard() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Filters
+    const [filterType, setFilterType] = useState('day');
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+
+    const [monthFilterType, setMonthFilterType] = useState('month');
+    const [monthStartDate, setMonthStartDate] = useState(null);
+    const [monthEndDate, setMonthEndDate] = useState(null);
+
+    const [productFilterType, setProductFilterType] = useState('month');
+    const [productStartDate, setProductStartDate] = useState(null);
+    const [productEndDate, setProductEndDate] = useState(null);
+
     useEffect(() => {
         let mounted = true;
         (async () => {
             try {
                 setLoading(true);
                 const u = await getAllUser();
-                const o = await getAllOrderAdmin(token, {
-                    /* limit: 500 */
-                });
+                const o = await getAllOrderAdmin(token, {});
                 if (!products?.length) await fetchProducts?.();
                 if (!mounted) return;
                 setUsers(u?.data?.data || []);
-                setOrders(o?.data?.data || []);
+                const withNames = await attachProductNames(o?.data?.data || []);
+                setOrders(withNames);
             } catch (e) {
                 console.error(e);
             } finally {
@@ -100,6 +197,7 @@ export default function Dashboard() {
         };
     }, []); // eslint-disable-line
 
+    // KPI
     const kpi = useMemo(() => {
         const usersCount = users.length;
         const productsCount = Number(productsTotal || products?.length || 0);
@@ -129,12 +227,34 @@ export default function Dashboard() {
         };
     }, [users, orders, products, productsTotal]);
 
-    const revenueSeries = useMemo(() => sumByDay(orders), [orders]);
+    // Data series
+    const revenueSeries = useMemo(
+        () => groupRevenue(orders, filterType, startDate, endDate),
+        [orders, filterType, startDate, endDate]
+    );
+    const revenueMonthSeries = useMemo(
+        () =>
+            revenueByMonth(
+                orders,
+                monthFilterType,
+                monthStartDate,
+                monthEndDate
+            ),
+        [orders, monthFilterType, monthStartDate, monthEndDate]
+    );
     const topProducts = useMemo(
-        () => topProductsFromOrders(orders, 5),
-        [orders]
+        () =>
+            topProductsFiltered(
+                orders,
+                productFilterType,
+                productStartDate,
+                productEndDate,
+                5
+            ),
+        [orders, productFilterType, productStartDate, productEndDate]
     );
 
+    // Activities
     const activities = useMemo(() => {
         const logs = getActivities().slice(0, 20);
         if (logs.length) return logs;
@@ -150,7 +270,7 @@ export default function Dashboard() {
 
     return (
         <div className={styles.wrapper}>
-            {/* KPI cards */}
+            {/* KPI */}
             <div className={styles.kpiGrid}>
                 <KPI title='Người dùng' value={kpi.usersCount} />
                 <KPI title='Sản phẩm' value={kpi.productsCount} />
@@ -167,46 +287,86 @@ export default function Dashboard() {
 
             {/* Charts */}
             <div className={styles.chartGrid}>
-                <div className={styles.chartPanel}>
-                    <h3 className={styles.cardTitle}>Doanh thu 30 ngày</h3>
-                    <div className={styles.chartBody}>
-                        <ResponsiveContainer width='100%' height='100%'>
-                            <LineChart data={revenueSeries}>
-                                <CartesianGrid strokeDasharray='3 3' />
-                                <XAxis dataKey='date' tick={{ fontSize: 12 }} />
-                                <YAxis tick={{ fontSize: 12 }} />
-                                <Tooltip
-                                    formatter={(v) => `${formatVND(v)} ₫`}
-                                />
-                                <Line
-                                    type='monotone'
-                                    dataKey='revenue'
-                                    stroke='#2563eb'
-                                    strokeWidth={2}
-                                    dot={false}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                {/* Doanh thu */}
+                <ChartPanel title='Doanh thu'>
+                    <FilterBox
+                        filterType={filterType}
+                        setFilterType={setFilterType}
+                        startDate={startDate}
+                        setStartDate={setStartDate}
+                        endDate={endDate}
+                        setEndDate={setEndDate}
+                    />
+                    <ResponsiveContainer width='100%' height='100%'>
+                        <LineChart data={revenueSeries}>
+                            <CartesianGrid strokeDasharray='3 3' />
+                            <XAxis dataKey='date' />
+                            <YAxis />
+                            <Tooltip formatter={(v) => `${formatVND(v)} ₫`} />
+                            <Line
+                                type='monotone'
+                                dataKey='revenue'
+                                stroke='#2563eb'
+                                strokeWidth={2}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </ChartPanel>
 
-                <div className={styles.chartPanel}>
-                    <h3 className={styles.cardTitle}>Top sản phẩm bán chạy</h3>
-                    <div className={styles.chartBody}>
-                        <ResponsiveContainer width='100%' height='100%'>
-                            <BarChart data={topProducts}>
-                                <CartesianGrid strokeDasharray='3 3' />
-                                <XAxis dataKey='name' tick={{ fontSize: 12 }} />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey='qty' fill='#10b981' />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                {/* Doanh thu tháng */}
+                {/* <ChartPanel title='Doanh thu tháng'>
+                    <FilterBox
+                        filterType={monthFilterType}
+                        setFilterType={setMonthFilterType}
+                        startDate={monthStartDate}
+                        setStartDate={setMonthStartDate}
+                        endDate={monthEndDate}
+                        setEndDate={setMonthEndDate}
+                    />
+                    <ResponsiveContainer width='100%' height='100%'>
+                        <LineChart data={revenueMonthSeries}>
+                            <CartesianGrid strokeDasharray='3 3' />
+                            <XAxis dataKey='date' />
+                            <YAxis />
+                            <Tooltip formatter={(v) => `${formatVND(v)} ₫`} />
+                            <Line
+                                type='monotone'
+                                dataKey='revenue'
+                                stroke='#10b981'
+                                strokeWidth={2}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </ChartPanel> */}
+
+                {/* Top sản phẩm */}
+                <ChartPanel title='Top sản phẩm bán chạy'>
+                    <FilterBox
+                        filterType={productFilterType}
+                        setFilterType={setProductFilterType}
+                        startDate={productStartDate}
+                        setStartDate={setProductStartDate}
+                        endDate={productEndDate}
+                        setEndDate={setProductEndDate}
+                    />
+                    <ResponsiveContainer width='100%' height='100%'>
+                        <BarChart data={topProducts}>
+                            <CartesianGrid strokeDasharray='3 3' />
+                            <XAxis dataKey='name' />
+                            <YAxis />
+                            <Tooltip
+                                formatter={(value, name, props) => [
+                                    `${value} sản phẩm`,
+                                    props.payload.name
+                                ]}
+                            />
+                            <Bar dataKey='qty' fill='#f59e0b' />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </ChartPanel>
             </div>
 
-            {/* Recent activity & Latest orders */}
+            {/* Activity & Orders */}
             <div className={styles.bottomGrid}>
                 <div className={styles.activityList}>
                     <h3 className={styles.cardTitle}>Nhật ký hoạt động</h3>
@@ -223,11 +383,66 @@ export default function Dashboard() {
     );
 }
 
+// =========================
+// Reusable components
+// =========================
 function KPI({ title, value }) {
     return (
         <div className={styles.kpiCard}>
             <div className={styles.kpiTitle}>{title}</div>
             <div className={styles.kpiValue}>{value}</div>
+        </div>
+    );
+}
+
+function FilterBox({
+    filterType,
+    setFilterType,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate
+}) {
+    return (
+        <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+            <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+            >
+                <option value='day'>Theo ngày</option>
+                <option value='month'>Theo tháng</option>
+                <option value='year'>Theo năm</option>
+                <option value='custom'>Khoảng thời gian</option>
+            </select>
+            {filterType === 'custom' && (
+                <div style={{ display: 'flex', gap: 10 }}>
+                    <DatePicker
+                        selected={startDate}
+                        onChange={setStartDate}
+                        selectsStart
+                        startDate={startDate}
+                        endDate={endDate}
+                        placeholderText='Từ ngày'
+                    />
+                    <DatePicker
+                        selected={endDate}
+                        onChange={setEndDate}
+                        selectsEnd
+                        startDate={startDate}
+                        endDate={endDate}
+                        placeholderText='Đến ngày'
+                    />
+                </div>
+            )}
+        </div>
+    );
+}
+
+function ChartPanel({ title, children }) {
+    return (
+        <div className={styles.chartPanel}>
+            <h3 className={styles.cardTitle}>{title}</h3>
+            <div className={styles.chartBody}>{children}</div>
         </div>
     );
 }

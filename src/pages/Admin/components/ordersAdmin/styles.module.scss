@@ -1,290 +1,154 @@
 @use '@styles/mixin.module.scss' as *;
 @use '@styles/variables.module.scss' as *;
-
 .topBar {
     display: flex;
+    align-items: center;
     gap: 8px;
-    margin: 12px 0 16px;
-    flex-wrap: wrap;
+    padding: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    width: 1200px;
 }
 
 .statusBtn {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
     background: #fff;
     cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #f3f4f6;
+    }
 }
 
 .statusBtnActive {
+    background: #2563eb;
+    color: #fff;
     border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.actionsCell {
-    white-space: nowrap;
-}
-
-.confirmLink {
-    margin-right: 12px;
-    color: #2563eb;
-    cursor: pointer;
-}
-
-.deleteLink {
-    color: #dc2626;
-    cursor: pointer;
-}
-
-.badgePending {
-    color: #374151;
-    background: #e5e7eb;
-    padding: 2px 8px;
-    border-radius: 9999px;
-}
-.badgeProcessing {
-    color: #1d4ed8;
-    background: #dbeafe;
-    padding: 2px 8px;
-    border-radius: 9999px;
-}
-.badgeShipped {
-    color: #6d28d9;
-    background: #ede9fe;
-    padding: 2px 8px;
-    border-radius: 9999px;
-}
-.badgeDelivered {
-    color: #059669;
-    background: #d1fae5;
-    padding: 2px 8px;
-    border-radius: 9999px;
-}
-.badgeCancelled {
-    color: #b91c1c;
-    background: #fee2e2;
-    padding: 2px 8px;
-    border-radius: 9999px;
 }
 
 .ListOrders {
-    // width: 100%;
-    margin: 0 auto;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e1e1e1;
-    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
 
     table {
         width: 100%;
         border-collapse: collapse;
-        text-align: left;
-        margin-top: 10px;
 
         thead {
-            tr {
-                th {
-                    padding: 10px 15px;
-                    border-bottom: 1px solid #ccc;
-                    font-size: 20px;
-                    font-weight: 300;
-                    // text-align: center;
-                }
-
-                th:first-child {
-                    padding-left: 0;
-                    text-align: left;
-                }
-
-                th:last-child {
-                    padding-right: 0;
-                    text-align: right;
-                }
+            background: #f3f4f6;
+            th {
+                padding: 10px;
+                text-align: left;
+                font-size: 14px;
+                color: #374151;
             }
         }
 
         tbody {
             tr {
+                border-top: 1px solid #e5e7eb;
+
+                &:hover {
+                    background: #f9fafb;
+                }
+
                 td {
-                    padding: 15px;
-                    vertical-align: top;
-                    color: $secondary_color;
+                    padding: 10px;
                     font-size: 14px;
-                    font-weight: 300;
-                    a {
-                        cursor: pointer;
-                        color: rgb(16, 3, 255);
-                    }
-                    &:nth-child(1) {
-                        display: flex;
-                        padding-left: 0;
-                        color: $four_color;
-                        font-size: 16px;
-
-                        img {
-                            width: calc(100px - 0.71em);
-                            margin-right: 10px;
-                            border-radius: 2px;
-                        }
-
-                        div {
-                            flex-grow: 1;
-
-                            p:first-child {
-                                margin: 0;
-                            }
-
-                            p:last-child {
-                                font-size: 0.9em;
-                                color: #777;
-                            }
-                        }
-                    }
-                    &:nth-child(4) {
-                        color: $thr_color;
-                    }
-
-                    &:nth-child(5) {
-                        select {
-                            width: 100%;
-                            padding: 8px;
-                            border: 1px solid #ccc;
-                            border-radius: 1px;
-                            color: $secondary_color;
-                        }
-                    }
-
-                    &:last-child {
-                        text-align: right;
-                        padding-right: 0;
-                    }
+                    color: #111827;
                 }
             }
         }
     }
-    .loadingCart {
-        @include flex_box_custom(center, center, 0px);
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(235, 235, 235, 0.5);
-    }
 }
 
-/* src/pages/BulkInvoicesPage/bulk-invoices.scss */
-.bulk-wrap {
-    padding: 16px;
-    background: #f6f7f9;
+.actionsCell {
+    display: flex;
+    gap: 8px;
 }
 
-.toolbar button {
-    padding: 8px 12px;
-    border: 1px solid #d0d7de;
-    background: #fff;
+.confirmLink {
+    background: #10b981;
+    color: #fff;
+    padding: 5px 12px;
     border-radius: 6px;
+    font-size: 13px;
     cursor: pointer;
-    margin-bottom: 12px;
+    border: none;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #059669;
+    }
 }
 
-.invoice.a4 {
-    width: 210mm;
-    min-height: 297mm;
-    margin: 0 auto 12px;
+.deleteLink {
+    background: #ef4444;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #dc2626;
+    }
+}
+
+.badgePending {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.badgeProcessing {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.badgeShipped {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.badgeDelivered {
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.badgeCancelled {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* Biểu đồ */
+.chartBox {
     background: #fff;
-    color: #111;
-    padding: 18mm 16mm;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    page-break-after: always; /* 👈 mỗi hóa đơn 1 trang */
-}
-
-.inv-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-.inv-header h1 {
-    margin: 0 0 6px;
-    font-size: 20px;
-}
-.inv-brand {
-    text-align: right;
-}
-.inv-brand .brand-name {
-    font-weight: 700;
-}
-
-.inv-parties {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    .party {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 10px 12px;
-    }
-    .party-title {
-        font-weight: 600;
-        margin-bottom: 4px;
-    }
-}
-
-.inv-items table {
-    width: 100%;
-    border-collapse: collapse;
-}
-.inv-items th,
-.inv-items td {
+    padding: 16px;
     border: 1px solid #e5e7eb;
-    padding: 8px;
-    text-align: left;
-}
-.inv-items th {
-    background: #f8fafc;
-}
-
-.inv-total {
-    margin-left: auto;
-    width: 300px;
-}
-.inv-total .total-line {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-}
-.inv-total .grand {
-    border-top: 1px dashed #d1d5db;
-    margin-top: 6px;
-    padding-top: 8px;
-    font-size: 16px;
-}
-
-.inv-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 24px;
-}
-.inv-footer div {
-    width: 40%;
-    text-align: center;
-}
-
-@page {
-    size: A4;
-    margin: 10mm;
-}
-@media print {
-    .toolbar {
-        display: none !important;
-    }
-    .invoice.a4 {
-        box-shadow: none;
-        margin: 0;
-    }
-    body {
-        background: #fff;
-    }
+    border-radius: 8px;
 }
