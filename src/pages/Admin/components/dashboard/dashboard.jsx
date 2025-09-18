@@ -8,8 +8,8 @@ import { getActivities } from '@/utils/auditLog';
 
 import {
     ResponsiveContainer,
-    LineChart,
-    Line,
+    AreaChart,
+    Area,
     XAxis,
     YAxis,
     Tooltip,
@@ -20,18 +20,19 @@ import {
 
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { vi } from 'date-fns/locale';
 import styles from './styles.module.scss';
 
 // =========================
 // Utils
 // =========================
-function formatVND(n) {
-    return (Number(n) || 0).toLocaleString('vi-VN');
-}
+const compact = (n) =>
+    new Intl.NumberFormat('vi-VN', { notation: 'compact' }).format(
+        Number(n) || 0
+    );
+const formatVND = (n) => (Number(n) || 0).toLocaleString('vi-VN') + ' ₫';
 
-// Cache tên sản phẩm
 const productNameCache = new Map();
-
 async function fetchProductName(productId) {
     if (!productId) return null;
     if (productNameCache.has(productId)) return productNameCache.get(productId);
@@ -72,49 +73,22 @@ async function attachProductNames(orders) {
     }));
 }
 
-// =========================
-// Grouping functions
-// =========================
 function groupRevenue(orders, filterType, startDate, endDate) {
     const m = new Map();
     for (const o of orders) {
         if (o?.status !== 'delivered') continue;
         const d = new Date(o.createdAt || o.updatedAt || Date.now());
+        if (filterType === 'custom' && startDate && endDate) {
+            if (d < startDate || d > endDate) continue;
+        }
         let key = '';
-
         if (filterType === 'day') key = d.toLocaleDateString('vi-VN');
         else if (filterType === 'month')
             key = `${d.getMonth() + 1}/${d.getFullYear()}`;
         else if (filterType === 'year') key = `${d.getFullYear()}`;
         else key = d.toLocaleDateString('vi-VN');
-
-        if (filterType === 'custom' && startDate && endDate) {
-            if (d < startDate || d > endDate) continue;
-        }
-
         const amount = Number(o.totalAmount || o.amounts?.grandTotal || 0);
         m.set(key, (m.get(key) || 0) + amount);
-    }
-    return Array.from(m.entries()).map(([date, revenue]) => ({
-        date,
-        revenue
-    }));
-}
-
-function revenueByMonth(orders, filterType, startDate, endDate) {
-    const m = new Map();
-    for (const o of orders) {
-        if (o?.status !== 'delivered') continue;
-        const d = new Date(o.createdAt || o.updatedAt);
-        if (filterType === 'custom' && startDate && endDate) {
-            if (d < startDate || d > endDate) continue;
-        }
-        const ymKey =
-            filterType === 'year'
-                ? `${d.getFullYear()}`
-                : `${d.getMonth() + 1}/${d.getFullYear()}`;
-        const amount = Number(o.totalAmount || o.amounts?.grandTotal || 0);
-        m.set(ymKey, (m.get(ymKey) || 0) + amount);
     }
     return Array.from(m.entries()).map(([date, revenue]) => ({
         date,
@@ -146,9 +120,6 @@ function topProductsFiltered(orders, filterType, startDate, endDate, topN = 5) {
         .slice(0, topN);
 }
 
-// =========================
-// Component
-// =========================
 export default function Dashboard() {
     const token = Cookies.get('token');
     const {
@@ -165,10 +136,6 @@ export default function Dashboard() {
     const [filterType, setFilterType] = useState('day');
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-
-    const [monthFilterType, setMonthFilterType] = useState('month');
-    const [monthStartDate, setMonthStartDate] = useState(null);
-    const [monthEndDate, setMonthEndDate] = useState(null);
 
     const [productFilterType, setProductFilterType] = useState('month');
     const [productStartDate, setProductStartDate] = useState(null);
@@ -205,9 +172,13 @@ export default function Dashboard() {
 
         const todayISO = new Date().toISOString().slice(0, 10);
         let revenueToday = 0,
-            revenueMonth = 0;
+            revenueMonth = 0,
+            revenueYesterday = 0;
         const now = new Date();
         const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const yesterdayISO = new Date(Date.now() - 86400000)
+            .toISOString()
+            .slice(0, 10);
 
         for (const o of orders) {
             if (o?.status !== 'delivered') continue;
@@ -216,31 +187,27 @@ export default function Dashboard() {
             const ymKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
             const amount = Number(o.totalAmount || o.amounts?.grandTotal || 0);
             if (iso === todayISO) revenueToday += amount;
+            if (iso === yesterdayISO) revenueYesterday += amount;
             if (ymKey === ym) revenueMonth += amount;
         }
+
+        const dayChange = revenueYesterday
+            ? ((revenueToday - revenueYesterday) / revenueYesterday) * 100
+            : null;
+
         return {
             usersCount,
             productsCount,
             ordersCount,
             revenueToday,
-            revenueMonth
+            revenueMonth,
+            dayChange
         };
     }, [users, orders, products, productsTotal]);
 
-    // Data series
     const revenueSeries = useMemo(
         () => groupRevenue(orders, filterType, startDate, endDate),
         [orders, filterType, startDate, endDate]
-    );
-    const revenueMonthSeries = useMemo(
-        () =>
-            revenueByMonth(
-                orders,
-                monthFilterType,
-                monthStartDate,
-                monthEndDate
-            ),
-        [orders, monthFilterType, monthStartDate, monthEndDate]
     );
     const topProducts = useMemo(
         () =>
@@ -254,41 +221,29 @@ export default function Dashboard() {
         [orders, productFilterType, productStartDate, productEndDate]
     );
 
-    // Activities
-    const activities = useMemo(() => {
-        const logs = getActivities().slice(0, 20);
-        if (logs.length) return logs;
-        return (orders || []).slice(0, 10).map((o) => ({
-            id: o._id,
-            at: o.createdAt || o.updatedAt,
-            who: 'system',
-            type: 'order',
-            action: 'Đã tạo',
-            meta: { code: o.code || o._id?.slice(-6), amount: o.totalAmount }
-        }));
-    }, [orders]);
-
     return (
-        <div className={styles.wrapper}>
+        <div className={styles.v2Wrap}>
             {/* KPI */}
-            <div className={styles.kpiGrid}>
-                <KPI title='Người dùng' value={kpi.usersCount} />
-                <KPI title='Sản phẩm' value={kpi.productsCount} />
-                <KPI title='Đơn hàng' value={kpi.ordersCount} />
+            <div className={styles.v2KpiGrid}>
+                <KPI title='Người dùng' value={kpi.usersCount} icon='user' />
+                <KPI title='Sản phẩm' value={kpi.productsCount} icon='box' />
+                <KPI title='Đơn hàng' value={kpi.ordersCount} icon='cart' />
                 <KPI
                     title='Doanh thu hôm nay'
-                    value={formatVND(kpi.revenueToday) + ' ₫'}
+                    value={formatVND(kpi.revenueToday)}
+                    icon='money'
+                    delta={kpi.dayChange}
                 />
                 <KPI
                     title='Doanh thu tháng'
-                    value={formatVND(kpi.revenueMonth) + ' ₫'}
+                    value={formatVND(kpi.revenueMonth)}
+                    icon='calendar'
                 />
             </div>
 
             {/* Charts */}
-            <div className={styles.chartGrid}>
-                {/* Doanh thu */}
-                <ChartPanel title='Doanh thu'>
+            <div className={styles.v2ChartGrid}>
+                <Card title='Doanh thu'>
                     <FilterBox
                         filterType={filterType}
                         setFilterType={setFilterType}
@@ -298,49 +253,66 @@ export default function Dashboard() {
                         setEndDate={setEndDate}
                     />
                     <ResponsiveContainer width='100%' height='100%'>
-                        <LineChart data={revenueSeries}>
-                            <CartesianGrid strokeDasharray='3 3' />
-                            <XAxis dataKey='date' />
-                            <YAxis />
-                            <Tooltip formatter={(v) => `${formatVND(v)} ₫`} />
-                            <Line
+                        <AreaChart
+                            data={revenueSeries}
+                            margin={{ left: 8, right: 8, top: 10, bottom: 0 }}
+                        >
+                            <defs>
+                                <linearGradient
+                                    id='revGrad'
+                                    x1='0'
+                                    y1='0'
+                                    x2='0'
+                                    y2='1'
+                                >
+                                    <stop
+                                        offset='0%'
+                                        stopColor='#6366f1'
+                                        stopOpacity={0.35}
+                                    />
+                                    <stop
+                                        offset='100%'
+                                        stopColor='#6366f1'
+                                        stopOpacity={0.02}
+                                    />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid
+                                strokeDasharray='3 3'
+                                stroke='var(--v2-grid)'
+                            />
+                            <XAxis
+                                dataKey='date'
+                                tick={{ fill: 'var(--v2-muted)' }}
+                                tickMargin={8}
+                            />
+                            <YAxis
+                                tick={{ fill: 'var(--v2-muted)' }}
+                                tickFormatter={compact}
+                                width={60}
+                            />
+                            <Tooltip
+                                formatter={(v) => formatVND(v)}
+                                contentStyle={{
+                                    background: '#ffffff',
+                                    border: '1px solid var(--v2-border)',
+                                    borderRadius: 12,
+                                    color: '#0f172a'
+                                }}
+                                labelStyle={{ color: '#0f172a' }}
+                            />
+                            <Area
                                 type='monotone'
                                 dataKey='revenue'
-                                stroke='#2563eb'
-                                strokeWidth={2}
+                                stroke='#6366f1'
+                                strokeWidth={2.5}
+                                fill='url(#revGrad)'
                             />
-                        </LineChart>
+                        </AreaChart>
                     </ResponsiveContainer>
-                </ChartPanel>
+                </Card>
 
-                {/* Doanh thu tháng */}
-                {/* <ChartPanel title='Doanh thu tháng'>
-                    <FilterBox
-                        filterType={monthFilterType}
-                        setFilterType={setMonthFilterType}
-                        startDate={monthStartDate}
-                        setStartDate={setMonthStartDate}
-                        endDate={monthEndDate}
-                        setEndDate={setMonthEndDate}
-                    />
-                    <ResponsiveContainer width='100%' height='100%'>
-                        <LineChart data={revenueMonthSeries}>
-                            <CartesianGrid strokeDasharray='3 3' />
-                            <XAxis dataKey='date' />
-                            <YAxis />
-                            <Tooltip formatter={(v) => `${formatVND(v)} ₫`} />
-                            <Line
-                                type='monotone'
-                                dataKey='revenue'
-                                stroke='#10b981'
-                                strokeWidth={2}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </ChartPanel> */}
-
-                {/* Top sản phẩm */}
-                <ChartPanel title='Top sản phẩm bán chạy'>
+                <Card title='Top sản phẩm bán chạy'>
                     <FilterBox
                         filterType={productFilterType}
                         setFilterType={setProductFilterType}
@@ -350,47 +322,117 @@ export default function Dashboard() {
                         setEndDate={setProductEndDate}
                     />
                     <ResponsiveContainer width='100%' height='100%'>
-                        <BarChart data={topProducts}>
-                            <CartesianGrid strokeDasharray='3 3' />
-                            <XAxis dataKey='name' />
-                            <YAxis />
+                        <BarChart
+                            data={topProducts}
+                            layout='vertical'
+                            margin={{ left: 12, right: 8, top: 10, bottom: 0 }}
+                        >
+                            <CartesianGrid
+                                strokeDasharray='3 3'
+                                stroke='var(--v2-grid)'
+                            />
+                            <XAxis
+                                type='number'
+                                tick={{ fill: 'var(--v2-muted)' }}
+                            />
+                            <YAxis
+                                type='category'
+                                dataKey='name'
+                                tick={{ fill: 'var(--v2-muted)' }}
+                                width={180}
+                            />
                             <Tooltip
                                 formatter={(value, name, props) => [
                                     `${value} sản phẩm`,
                                     props.payload.name
                                 ]}
+                                contentStyle={{
+                                    background: '#ffffff',
+                                    border: '1px solid var(--v2-border)',
+                                    borderRadius: 12,
+                                    color: '#0f172a'
+                                }}
+                                labelStyle={{ color: '#0f172a' }}
                             />
-                            <Bar dataKey='qty' fill='#f59e0b' />
+                            <Bar
+                                dataKey='qty'
+                                fill='#f59e0b'
+                                radius={[8, 8, 8, 8]}
+                            />
                         </BarChart>
                     </ResponsiveContainer>
-                </ChartPanel>
+                </Card>
             </div>
 
             {/* Activity & Orders */}
-            <div className={styles.bottomGrid}>
-                <div className={styles.activityList}>
-                    <h3 className={styles.cardTitle}>Nhật ký hoạt động</h3>
-                    <ActivityList items={activities} />
-                </div>
-                <div className={styles.latestOrders}>
-                    <h3 className={styles.cardTitle}>Đơn mới nhất</h3>
+            <div className={styles.v2BottomGrid}>
+                <Card title='Nhật ký hoạt động'>
+                    <ActivityList
+                        items={useMemo(() => {
+                            const logs = getActivities().slice(0, 20);
+                            if (logs.length) return logs;
+                            return (orders || []).slice(0, 10).map((o) => ({
+                                id: o._id,
+                                at: o.createdAt || o.updatedAt,
+                                who: 'system',
+                                type: 'order',
+                                action: 'Đã tạo',
+                                meta: {
+                                    code: o.code || o._id?.slice(-6),
+                                    amount: o.totalAmount
+                                }
+                            }));
+                        }, [orders])}
+                    />
+                </Card>
+
+                <Card title='Đơn mới nhất'>
                     <LatestOrders orders={(orders || []).slice(0, 8)} />
-                </div>
+                </Card>
             </div>
 
-            {loading && <div className={styles.muted}>Đang tải dữ liệu…</div>}
+            {loading && <div className={styles.v2Muted}>Đang tải dữ liệu…</div>}
         </div>
     );
 }
 
 // =========================
-// Reusable components
+// Reusable UI
 // =========================
-function KPI({ title, value }) {
+function Card({ title, children }) {
     return (
-        <div className={styles.kpiCard}>
-            <div className={styles.kpiTitle}>{title}</div>
-            <div className={styles.kpiValue}>{value}</div>
+        <section className={styles.v2Card}>
+            <div className={styles.v2CardHead}>{title}</div>
+            <div className={styles.v2CardBody}>{children}</div>
+        </section>
+    );
+}
+
+function KPI({ title, value, icon, delta }) {
+    const arrow = delta == null ? null : delta >= 0 ? '▲' : '▼';
+    const deltaText =
+        delta == null
+            ? ''
+            : `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}% hôm qua`;
+    return (
+        <div className={styles.v2Kpi}>
+            <div className={styles.v2KpiTop}>
+                <span
+                    className={`${styles.v2KpiIcon} ${styles[`ic-${icon}`]}`}
+                    aria-hidden
+                />
+                <span className={styles.v2KpiTitle}>{title}</span>
+            </div>
+            <div className={styles.v2KpiRow}>
+                <div className={styles.v2KpiValue}>{value}</div>
+                {delta != null && (
+                    <span
+                        className={`${styles.v2KpiDelta} ${delta >= 0 ? styles.v2Up : styles.v2Down}`}
+                    >
+                        {arrow} {deltaText}
+                    </span>
+                )}
+            </div>
         </div>
     );
 }
@@ -404,10 +446,12 @@ function FilterBox({
     setEndDate
 }) {
     return (
-        <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+        <div className={styles.v2Filter}>
             <select
+                className={styles.v2Select}
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
+                aria-label='Kiểu lọc'
             >
                 <option value='day'>Theo ngày</option>
                 <option value='month'>Theo tháng</option>
@@ -415,7 +459,7 @@ function FilterBox({
                 <option value='custom'>Khoảng thời gian</option>
             </select>
             {filterType === 'custom' && (
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div className={styles.v2DateRange}>
                     <DatePicker
                         selected={startDate}
                         onChange={setStartDate}
@@ -423,6 +467,8 @@ function FilterBox({
                         startDate={startDate}
                         endDate={endDate}
                         placeholderText='Từ ngày'
+                        locale={vi}
+                        dateFormat='dd/MM/yyyy'
                     />
                     <DatePicker
                         selected={endDate}
@@ -431,6 +477,8 @@ function FilterBox({
                         startDate={startDate}
                         endDate={endDate}
                         placeholderText='Đến ngày'
+                        locale={vi}
+                        dateFormat='dd/MM/yyyy'
                     />
                 </div>
             )}
@@ -438,20 +486,11 @@ function FilterBox({
     );
 }
 
-function ChartPanel({ title, children }) {
-    return (
-        <div className={styles.chartPanel}>
-            <h3 className={styles.cardTitle}>{title}</h3>
-            <div className={styles.chartBody}>{children}</div>
-        </div>
-    );
-}
-
 function ActivityList({ items = [] }) {
     if (!items.length)
-        return <div className={styles.muted}>Chưa có hoạt động nào.</div>;
+        return <div className={styles.v2Muted}>Chưa có hoạt động nào.</div>;
     return (
-        <ul className={styles.activityUl}>
+        <ul className={styles.v2ActivityUl}>
             {items.map((a, i) => {
                 const when = a.at
                     ? new Date(a.at).toLocaleString('vi-VN')
@@ -460,15 +499,15 @@ function ActivityList({ items = [] }) {
                     if (a.type === 'product')
                         return `${a.action} sản phẩm ${a?.meta?.name || ''}`;
                     if (a.type === 'user')
-                        return `${a.action} user ${a?.meta?.username || ''}`;
+                        return `${a.action} người dùng ${a?.meta?.username || ''}`;
                     if (a.type === 'order')
                         return `${a.action} đơn ${a?.meta?.code || ''}${a?.meta?.to ? ` → ${a.meta.to}` : ''}`;
                     return `${a.action} ${a.type}`;
                 })();
                 return (
-                    <li key={a.id || i} className={styles.activityItem}>
+                    <li key={a.id || i} className={styles.v2ActivityItem}>
                         <span>{line}</span>
-                        <span className={styles.activityWhen}>{when}</span>
+                        <span className={styles.v2ActivityWhen}>{when}</span>
                     </li>
                 );
             })}
@@ -478,18 +517,19 @@ function ActivityList({ items = [] }) {
 
 function LatestOrders({ orders = [] }) {
     if (!orders.length)
-        return <div className={styles.muted}>Chưa có đơn nào.</div>;
+        return <div className={styles.v2Muted}>Chưa có đơn nào.</div>;
     const statusMap = {
         pending: 'Chưa thanh toán',
+        completed: 'Đã thanh toán',
         processing: 'Đã xác nhận',
         shipped: 'Đang giao',
         delivered: 'Đã giao',
         cancelled: 'Đã hủy'
     };
     return (
-        <table className={styles.table}>
+        <table className={styles.v2Table}>
             <thead>
-                <tr className={styles.theadRow}>
+                <tr>
                     <th>Mã</th>
                     <th>Khách</th>
                     <th>Tổng</th>
@@ -498,7 +538,7 @@ function LatestOrders({ orders = [] }) {
             </thead>
             <tbody>
                 {orders.map((o) => (
-                    <tr key={o._id} className={styles.tbodyRow}>
+                    <tr key={o._id}>
                         <td>#{o.code || String(o._id).slice(-6)}</td>
                         <td>
                             {[o.firstName, o.lastName]
@@ -507,8 +547,14 @@ function LatestOrders({ orders = [] }) {
                                 o.email ||
                                 '—'}
                         </td>
-                        <td>{formatVND(o.totalAmount)} VND</td>
-                        <td>{statusMap[o.status] || o.status}</td>
+                        <td>{formatVND(o.totalAmount)}</td>
+                        <td>
+                            <span
+                                className={`${styles.v2Status} ${styles['v2-' + (o.status || 'unknown')]}`}
+                            >
+                                {statusMap[o.status] || o.status}
+                            </span>
+                        </td>
                     </tr>
                 ))}
             </tbody>

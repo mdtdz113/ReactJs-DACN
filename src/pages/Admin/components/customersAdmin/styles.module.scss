@@ -18,7 +18,7 @@
 }
 
 .page {
-    padding: clamp(16px, 2vw, 24px);
+    padding: clamp(10px, 2vw, 24px);
     color: var(--text);
     background: var(--bg);
     min-height: 100%;
@@ -45,7 +45,7 @@
 }
 
 .searchInput {
-    width: min(420px, 90vw);
+    width: min(450px, 90vw);
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid var(--border);
@@ -71,7 +71,7 @@
     padding: 12px;
     margin-bottom: 16px;
 }
-@media (max-width: 100%) {
+@media (max-width: 80%) {
     .addForm {
         grid-template-columns: 1fr;
     }
@@ -140,7 +140,7 @@
 }
 
 .table {
-    width: 1300px;
+    width: 1200px;
     border-collapse: collapse;
     background: var(--card);
     border: 1px solid var(--border);

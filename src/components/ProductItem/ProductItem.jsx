@@ -48,7 +48,9 @@ function ProductItem({
         containerItem,
         leftBtn,
         isActiveSize,
-        btnClear
+        btnClear,
+        pricetext,
+        priceold
     } = styles;
 
     const hangleChooseSize = (size) => {
@@ -170,7 +172,7 @@ function ProductItem({
                         [textCenter]: !isHomePage
                     })}
                 >
-                    {price} VND
+                    <div>{price} VND </div>
                 </div>
                 {!isHomePage && (
                     <div
@@ -179,7 +181,9 @@ function ProductItem({
                         })}
                     >
                         <MyButton
-                            content={isLoading ? <Loading /> : 'Thêm vào giỏ hàng'}
+                            content={
+                                isLoading ? <Loading /> : 'Thêm vào giỏ hàng'
+                            }
                             onClick={() => hangleAddToCart()}
                         />
                     </div>

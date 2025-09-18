@@ -7,31 +7,34 @@ import { SideBarProvider } from '@/context/SideBarProvider';
 import SideBar from '@components/SideBar/SideBar';
 import { ToastProvider } from '@/context/ToastProvider';
 import { StoreProvider } from '@/context/storeProvider';
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
 function App() {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
     return (
-        <StoreProvider>
-            <ToastProvider>
-                <SideBarProvider>
-                    <BrowserRouter>
-                        <SideBar />
-                        <Suspense fallback={<div>Loading...</div>}>
-                            <Routes>
-                                {routers.map((item, index) => {
-                                    return (
-                                        <Route
-                                            key={index}
-                                            path={item.path}
-                                            element={<item.component />}
-                                        />
-                                    );
-                                })}
-                            </Routes>
-                        </Suspense>
-                    </BrowserRouter>
-                </SideBarProvider>
-            </ToastProvider>
-        </StoreProvider>
+        <GoogleOAuthProvider clientId={clientId}>
+            <StoreProvider>
+                <ToastProvider>
+                    <SideBarProvider>
+                        <BrowserRouter>
+                            <SideBar />
+                            <Suspense fallback={<div>Loading...</div>}>
+                                <Routes>
+                                    {routers.map((item, index) => {
+                                        return (
+                                            <Route
+                                                key={index}
+                                                path={item.path}
+                                                element={<item.component />}
+                                            />
+                                        );
+                                    })}
+                                </Routes>
+                            </Suspense>
+                        </BrowserRouter>
+                    </SideBarProvider>
+                </ToastProvider>
+            </StoreProvider>
+        </GoogleOAuthProvider>
     );
 }
 

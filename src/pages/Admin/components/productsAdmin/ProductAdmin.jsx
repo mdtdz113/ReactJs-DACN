@@ -1,32 +1,77 @@
 import styles from './styles.module.scss';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { OurShopContext } from '@/context/OurShopProvider';
 import { AddProduct, deleteProduct, updateProduct } from '@/apis/productServer';
 import MyButton from '@components/Button/Button';
 
 function ProductAdmin() {
     const {
+        // layout & header
         productcontainer,
-        header,
-        btnadd,
+        toolbar,
+        title,
+        toolActions,
+        searchBox,
+        input,
+        select,
+        // table
+        tableWrap,
         producttable,
         imgplaceholder,
-        btnedit,
-        btndelete,
-        formcontainer,
-        formRow,
-        formLeft,
-        formRight,
+        // buttons
+        btnPrimary,
+        btnGhost,
+        btnWarn,
+        btnSmall,
+        // form
+        panel,
+        panelHead,
+        panelBody,
+        formGrid,
+        formCol,
+        field,
+        actions,
+        // pill
+        pill,
+        pillMuted,
+        // modal
+        modalBackdrop,
+        modalCard,
+        modalHead,
+        modalBody,
+        modalFoot,
+        sizeGrid,
         sizeRow,
-        formActions,
-        overflowItem
+        negative,
+        // drawer history
+        drawer,
+        drawerHead,
+        drawerBody,
+        chip,
+        chipMuted,
+        historyList,
+        historyItem,
+        // states
+        empty,
+        loading
     } = styles;
 
     const { products, fetchProducts, hangleLoadMore, total } =
         useContext(OurShopContext);
 
     // ---------- State chung ----------
-    const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(false);
+    const [query, setQuery] = useState('');
+    const [typeFilter, setTypeFilter] = useState('');
+
+    useEffect(() => {
+        // lần đầu làm tươi
+        (async () => {
+            setLoadingData(true);
+            await fetchProducts?.();
+            setLoadingData(false);
+        })();
+    }, []);
 
     // ---------- Form tạo / sửa ----------
     const [showForm, setShowForm] = useState(false);
@@ -50,23 +95,20 @@ function ProductAdmin() {
         };
     }
 
-    const normalizeSizeName = (name) => (name || '').trim().toUpperCase();
-    const isDuplicateSizeAtIndex = (sizes, idx) => {
-        const current = normalizeSizeName(sizes[idx]?.name);
-        if (!current) return false;
-        return sizes.some(
-            (s, i) => i !== idx && normalizeSizeName(s.name) === current
-        );
+    const normalize = (s) => (s || '').trim().toUpperCase();
+    const isDupAt = (sizes, idx) => {
+        const cur = normalize(sizes[idx]?.name);
+        if (!cur) return false;
+        return sizes.some((s, i) => i !== idx && normalize(s.name) === cur);
     };
 
-    const handleOpenAdd = () => {
+    const openAdd = () => {
         setFormData(defaultForm());
         setIsEditing(false);
         setEditId(null);
         setShowForm(true);
     };
-
-    const handleOpenEdit = (p) => {
+    const openEdit = (p) => {
         setFormData({
             name: p.name,
             price: p.price,
@@ -81,158 +123,150 @@ function ProductAdmin() {
         setShowForm(true);
     };
 
-    const handleChange = (e) => {
+    const onChangeField = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
-
-    const handleImageChange = (idx, value) => {
-        setFormData((prev) => {
-            const next = [...prev.images];
-            next[idx] = value;
-            return { ...prev, images: next };
-        });
-    };
-
+    const onChangeImage = (idx, value) =>
+        setFormData((p) => ({
+            ...p,
+            images: p.images.map((v, i) => (i === idx ? value : v))
+        }));
     const addImageRow = () =>
-        setFormData((prev) => ({ ...prev, images: [...prev.images, ''] }));
-
-    const removeImageRow = (idx) =>
-        setFormData((prev) => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== idx)
+        setFormData((p) => ({ ...p, images: [...p.images, ''] }));
+    const removeImage = (idx) =>
+        setFormData((p) => ({
+            ...p,
+            images: p.images.filter((_, i) => i !== idx)
         }));
 
-    const handleSizeChange = (idx, field, value) => {
-        setFormData((prev) => {
-            const next = [...prev.size];
-            next[idx][field] = field === 'quantity' ? Number(value) : value;
-            return { ...prev, size: next };
-        });
-    };
-
-    const addSizeRow = () =>
+    const changeSize = (idx, field, value) =>
         setFormData((prev) => ({
             ...prev,
-            size: [...prev.size, { name: '', quantity: 0 }]
+            size: prev.size.map((s, i) =>
+                i === idx
+                    ? {
+                          ...s,
+                          [field]:
+                              field === 'quantity'
+                                  ? Math.max(0, Number(value) || 0)
+                                  : value
+                      }
+                    : s
+            )
+        }));
+    const addSize = () =>
+        setFormData((p) => ({
+            ...p,
+            size: [...p.size, { name: '', quantity: 0 }]
+        }));
+    const removeSize = (idx) =>
+        setFormData((p) => ({
+            ...p,
+            size: p.size.filter((_, i) => i !== idx)
         }));
 
-    const removeSizeRow = (idx) =>
-        setFormData((prev) => ({
-            ...prev,
-            size: prev.size.filter((_, i) => i !== idx)
-        }));
-
-    const handleSaveProduct = async () => {
+    const saveProduct = async () => {
         try {
-            setLoading(true);
-
-            const cleanedSizes = (formData.size || [])
+            setLoadingData(true);
+            const sizes = (formData.size || [])
                 .map((s) => ({
-                    name: normalizeSizeName(s.name),
+                    name: normalize(s.name),
                     quantity: Math.max(0, Number(s.quantity) || 0)
                 }))
                 .filter((s) => s.name);
-
-            const names = cleanedSizes.map((s) => s.name);
+            const names = sizes.map((s) => s.name);
             const dupe = names.find((n, i) => names.indexOf(n) !== i);
             if (dupe) {
-                alert(`Tên size bị trùng: ${dupe}. Vui lòng sửa lại.`);
+                alert(`Tên size bị trùng: ${dupe}`);
                 return;
             }
-
-            const cleanedImages = (formData.images || [])
+            const images = (formData.images || [])
                 .map((i) => (i || '').trim())
                 .filter(Boolean);
-
             const payload = {
                 ...formData,
                 price: Number(formData.price) || 0,
-                images: cleanedImages.length ? cleanedImages : [''],
-                size: cleanedSizes
+                images: images.length ? images : [''],
+                size: sizes
             };
-
             if (isEditing) {
                 await updateProduct(editId, payload);
-                alert('Sửa sản phẩm thành công!');
+                alert('Đã cập nhật sản phẩm.');
             } else {
                 await AddProduct(payload);
-                alert('Thêm sản phẩm thành công!');
+                alert('Đã thêm sản phẩm.');
             }
-
             setShowForm(false);
             setFormData(defaultForm());
-            fetchProducts();
-        } catch (err) {
-            console.error(err);
+            await fetchProducts?.();
+        } catch (e) {
+            console.error(e);
             alert('Có lỗi khi lưu sản phẩm.');
         } finally {
-            setLoading(false);
+            setLoadingData(false);
         }
     };
 
-    const handleDeleteProduct = async (id) => {
-        if (!window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+    const deleteProd = async (id) => {
+        if (!window.confirm('Xóa sản phẩm này?')) return;
         try {
+            setLoadingData(true);
             await deleteProduct(id);
-            fetchProducts();
+            await fetchProducts?.();
         } catch (e) {
             console.error(e);
             alert('Xóa không thành công.');
+        } finally {
+            setLoadingData(false);
         }
     };
 
-    // ---------- Tính tổng tồn kho ----------
     const totalQty = (p) =>
         (p.size || []).reduce((sum, s) => sum + (Number(s.quantity) || 0), 0);
+    const vnd = (n) => (Number(n) || 0).toLocaleString('vi-VN');
 
-    const formatCurrency = (n) => (Number(n) || 0).toLocaleString('vi-VN');
-
-    // ---------- Điều chỉnh tồn theo size (Modal) ----------
-    const [showStockModal, setShowStockModal] = useState(false);
+    // ---------- Điều chỉnh tồn theo size ----------
+    const [stockOpen, setStockOpen] = useState(false);
     const [stockProduct, setStockProduct] = useState(null);
-    const [sizeDeltas, setSizeDeltas] = useState([]); // [{name, delta}]
+    const [deltas, setDeltas] = useState([]); // [{name, delta}]
     const [reason, setReason] = useState('restock');
     const [note, setNote] = useState('');
 
-    const openStockModal = (p) => {
+    const openStock = (p) => {
         setStockProduct(p);
-        setSizeDeltas((p.size || []).map((s) => ({ name: s.name, delta: 0 })));
+        setDeltas((p.size || []).map((s) => ({ name: s.name, delta: 0 })));
         setReason('restock');
         setNote('');
-        setShowStockModal(true);
+        setStockOpen(true);
     };
+    const setDelta = (idx, value) =>
+        setDeltas((prev) =>
+            prev.map((d, i) =>
+                i === idx ? { ...d, delta: Number(value) || 0 } : d
+            )
+        );
 
-    const changeDelta = (idx, value) => {
-        const v = Number(value) || 0;
-        setSizeDeltas((prev) => {
-            const next = [...prev];
-            next[idx] = { ...next[idx], delta: v };
-            return next;
-        });
-    };
-
-    const nextSizesPreview = useMemo(() => {
+    const previewRows = useMemo(() => {
         if (!stockProduct) return [];
-        const current = [...(stockProduct.size || [])];
-        return current.map((s) => {
-            const found = sizeDeltas.find(
-                (d) => normalizeSizeName(d.name) === normalizeSizeName(s.name)
+        return (stockProduct.size || []).map((s) => {
+            const f = deltas.find(
+                (d) => normalize(d.name) === normalize(s.name)
             );
-            const delta = found ? Number(found.delta) || 0 : 0;
+            const delta = f ? Number(f.delta) || 0 : 0;
             const after = (Number(s.quantity) || 0) + delta;
             return { name: s.name, before: s.quantity, delta, after };
         });
-    }, [stockProduct, sizeDeltas]);
+    }, [stockProduct, deltas]);
 
-    const hasNegativeAfter = nextSizesPreview.some((r) => r.after < 0);
-    const hasAnyChange = nextSizesPreview.some((r) => r.delta !== 0);
+    const invalidAfter = previewRows.some((r) => r.after < 0);
+    const anyChange = previewRows.some((r) => r.delta !== 0);
 
-    // ---------- Lịch sử hành động (localStorage) ----------
-    const HISTORY_KEY = (pid) => `stock_history_${pid}`;
+    // ---------- Lịch sử (localStorage) ----------
+    const HK = (pid) => `stock_history_${pid}`;
     const getHistory = (pid) => {
         try {
-            const raw = localStorage.getItem(HISTORY_KEY(pid));
+            const raw = localStorage.getItem(HK(pid));
             return raw ? JSON.parse(raw) : [];
         } catch {
             return [];
@@ -240,56 +274,30 @@ function ProductAdmin() {
     };
     const pushHistory = (pid, record) => {
         const old = getHistory(pid);
-        localStorage.setItem(
-            HISTORY_KEY(pid),
-            JSON.stringify([record, ...old])
-        );
+        localStorage.setItem(HK(pid), JSON.stringify([record, ...old]));
     };
-    const clearHistory = (pid) => {
-        localStorage.removeItem(HISTORY_KEY(pid));
-    };
+    const clearHistory = (pid) => localStorage.removeItem(HK(pid));
+    const [openHistoryFor, setOpenHistoryFor] = useState(null);
 
-    const [openHistoryFor, setOpenHistoryFor] = useState(null); // productId hoặc null
-
-    const openHistory = (p) => {
-        setOpenHistoryFor(p._id);
-    };
-    const closeHistory = () => setOpenHistoryFor(null);
-
-    const submitAdjustStock = async () => {
+    const submitAdjust = async () => {
         if (!stockProduct) return;
-        if (!hasAnyChange) {
-            alert('Chưa có thay đổi nào.');
+        if (!anyChange) {
+            alert('Chưa có thay đổi.');
             return;
         }
-        if (hasNegativeAfter) {
-            alert('Một số size sau điều chỉnh bị âm. Vui lòng sửa lại.');
+        if (invalidAfter) {
+            alert('Có size bị âm sau điều chỉnh.');
             return;
         }
-
         try {
-            setLoading(true);
-
-            const nextSizes = nextSizesPreview.map((r) => ({
+            setLoadingData(true);
+            const nextSizes = previewRows.map((r) => ({
                 name: r.name,
                 quantity: r.after
             }));
-
-            // Payload tối thiểu (cập nhật size)
-            const payload = {
-                name: stockProduct.name,
-                price: stockProduct.price,
-                description: stockProduct.description,
-                type: stockProduct.type,
-                material: stockProduct.material,
-                images: stockProduct.images,
-                size: nextSizes
-            };
-
+            const payload = { ...stockProduct, size: nextSizes };
             await updateProduct(stockProduct._id, payload);
-
-            // Lưu lịch sử (gộp theo lần chỉnh)
-            const changes = nextSizesPreview
+            const changes = previewRows
                 .filter((r) => r.delta !== 0)
                 .map((r) => ({
                     name: r.name,
@@ -297,7 +305,6 @@ function ProductAdmin() {
                     before: r.before,
                     after: r.after
                 }));
-
             pushHistory(stockProduct._id, {
                 id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
                 at: new Date().toISOString(),
@@ -306,370 +313,456 @@ function ProductAdmin() {
                 note: note?.trim() || null,
                 changes
             });
-
-            alert('Cập nhật số lượng theo size thành công!');
-            setShowStockModal(false);
+            alert('Đã cập nhật số lượng theo size.');
+            setStockOpen(false);
             setStockProduct(null);
-            setSizeDeltas([]);
+            setDeltas([]);
             setNote('');
-            fetchProducts();
+            await fetchProducts?.();
         } catch (e) {
             console.error(e);
-            alert('Có lỗi khi cập nhật số lượng.');
+            alert('Có lỗi khi cập nhật.');
         } finally {
-            setLoading(false);
+            setLoadingData(false);
         }
     };
 
+    // ---------- Lọc & tìm kiếm ----------
+    const filtered = (products || []).filter((p) => {
+        const matchQ =
+            !query || p.name?.toLowerCase().includes(query.toLowerCase());
+        const matchType =
+            !typeFilter || p.type?.toLowerCase() === typeFilter.toLowerCase();
+        return matchQ && matchType;
+    });
+
     return (
         <div className={productcontainer}>
-            {/* Header */}
-            <div className={header}>
-                <h2>Quản lý sản phẩm</h2>
-                <button className={btnadd} onClick={handleOpenAdd}>
-                    + Thêm sản phẩm mới
-                </button>
+            {/* Toolbar */}
+            <div className={toolbar}>
+                <div className={title}>Quản lý sản phẩm</div>
+                <div className={toolActions}>
+                    <div className={searchBox} role='search'>
+                        <input
+                            className={input}
+                            type='search'
+                            placeholder='Tìm theo tên sản phẩm…'
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                        <select
+                            className={select}
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                            aria-label='Lọc theo loại'
+                        >
+                            <option value=''>Tất cả loại</option>
+                            <option value='Áo'>Áo</option>
+                            <option value='Quần'>Quần</option>
+                            <option value='Phụ kiện'>Phụ kiện</option>
+                        </select>
+                    </div>
+                    <button
+                        className={`${btnGhost} ${btnSmall}`}
+                        onClick={() => {
+                            setLoadingData(true);
+                            fetchProducts?.().finally(() =>
+                                setLoadingData(false)
+                            );
+                        }}
+                    >
+                        Làm mới
+                    </button>
+                    <button className={btnPrimary} onClick={openAdd}>
+                        + Thêm sản phẩm
+                    </button>
+                </div>
             </div>
 
-            {/* Form Thêm/Sửa */}
-            <div className={styles.scrollContainer}>
-                {showForm && (
-                    <div className={formcontainer}>
-                        <h3>{isEditing ? 'Sửa sản phẩm' : 'Thêm sản phẩm'}</h3>
-
-                        <div className={formRow}>
-                            {/* Trái */}
-                            <div className={formLeft}>
-                                <h4>Tên sản phẩm</h4>
-                                <input
-                                    type='text'
-                                    name='name'
-                                    placeholder='Tên sản phẩm'
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                />
-
-                                <h4>Giá</h4>
-                                <input
-                                    type='number'
-                                    name='price'
-                                    placeholder='Giá'
-                                    value={formData.price}
-                                    onChange={handleChange}
-                                    min={0}
-                                />
-
-                                <h4>Mô tả</h4>
-                                <textarea
-                                    name='description'
-                                    placeholder='Mô tả'
-                                    value={formData.description}
-                                    onChange={handleChange}
-                                />
-
-                                <h4>Loại sản phẩm</h4>
-                                <input
-                                    type='text'
-                                    name='type'
-                                    placeholder='Loại'
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                />
-
-                                <h4>Chất liệu</h4>
-                                <input
-                                    type='text'
-                                    name='material'
-                                    placeholder='Chất liệu'
-                                    value={formData.material}
-                                    onChange={handleChange}
-                                />
+            {/* Form thêm/sửa */}
+            {showForm && (
+                <section className={panel}>
+                    <div className={panelHead}>
+                        {isEditing ? 'Sửa sản phẩm' : 'Thêm sản phẩm'}
+                    </div>
+                    <div className={panelBody}>
+                        <div className={formGrid}>
+                            <div className={formCol}>
+                                <label className={field}>
+                                    Tên sản phẩm
+                                    <input
+                                        name='name'
+                                        value={formData.name}
+                                        onChange={onChangeField}
+                                        placeholder='VD: Áo thun cổ tròn'
+                                    />
+                                </label>
+                                <label className={field}>
+                                    Giá (VNĐ)
+                                    <input
+                                        type='number'
+                                        min={0}
+                                        name='price'
+                                        value={formData.price}
+                                        onChange={onChangeField}
+                                        placeholder='VD: 199000'
+                                    />
+                                </label>
+                                <label className={field}>
+                                    Mô tả
+                                    <textarea
+                                        name='description'
+                                        value={formData.description}
+                                        onChange={onChangeField}
+                                        placeholder='Mô tả ngắn gọn…'
+                                        rows={4}
+                                    />
+                                </label>
+                                <label className={field}>
+                                    Loại
+                                    <input
+                                        name='type'
+                                        value={formData.type}
+                                        onChange={onChangeField}
+                                        placeholder='VD: Áo / Quần / Phụ kiện'
+                                    />
+                                </label>
+                                <label className={field}>
+                                    Chất liệu
+                                    <input
+                                        name='material'
+                                        value={formData.material}
+                                        onChange={onChangeField}
+                                        placeholder='VD: Cotton 100%'
+                                    />
+                                </label>
                             </div>
+                            <div className={formCol}>
+                                <div className={field}>
+                                    <div>Ảnh sản phẩm</div>
+                                    {formData.images.map((img, i) => (
+                                        <div key={i} className={sizeRow}>
+                                            <input
+                                                value={img}
+                                                onChange={(e) =>
+                                                    onChangeImage(
+                                                        i,
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder={`Link ảnh ${i + 1}`}
+                                            />
+                                            <button
+                                                className={btnGhost}
+                                                onClick={() => removeImage(i)}
+                                                type='button'
+                                            >
+                                                Xóa
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        className={btnGhost}
+                                        type='button'
+                                        onClick={addImageRow}
+                                    >
+                                        + Thêm ảnh
+                                    </button>
+                                </div>
 
-                            {/* Phải */}
-                            <div className={formRight}>
-                                <h4>Ảnh sản phẩm</h4>
-                                {formData.images.map((img, i) => (
-                                    <div key={i} className={sizeRow}>
-                                        <input
-                                            type='text'
-                                            placeholder={`Link ảnh ${i + 1}`}
-                                            value={img}
-                                            onChange={(e) =>
-                                                handleImageChange(
-                                                    i,
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <button
-                                            type='button'
-                                            onClick={() => removeImageRow(i)}
-                                        >
-                                            Xóa
-                                        </button>
-                                    </div>
-                                ))}
-                                <button type='button' onClick={addImageRow}>
-                                    + Thêm ảnh
-                                </button>
-
-                                <h4>Size &amp; Số lượng</h4>
-                                {formData.size.map((s, i) => (
-                                    <div key={i} className={sizeRow}>
-                                        <input
-                                            type='text'
-                                            placeholder='VD: S, M, L, XL...'
-                                            value={s.name}
-                                            onChange={(e) =>
-                                                handleSizeChange(
-                                                    i,
-                                                    'name',
-                                                    e.target.value
-                                                )
-                                            }
-                                            onBlur={(e) => {
-                                                const normalized =
-                                                    normalizeSizeName(
+                                <div className={field}>
+                                    <div>Size & số lượng</div>
+                                    {formData.size.map((s, i) => (
+                                        <div key={i} className={sizeRow}>
+                                            <input
+                                                value={s.name}
+                                                onChange={(e) =>
+                                                    changeSize(
+                                                        i,
+                                                        'name',
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder='VD: S, M, L…'
+                                                onBlur={(e) => {
+                                                    const n = normalize(
                                                         e.target.value
                                                     );
-                                                handleSizeChange(
-                                                    i,
-                                                    'name',
-                                                    normalized
-                                                );
-                                                const arr = [...formData.size];
-                                                arr[i].name = normalized;
-                                                if (
-                                                    isDuplicateSizeAtIndex(
-                                                        arr,
-                                                        i
+                                                    changeSize(i, 'name', n);
+                                                    const arr = [
+                                                        ...formData.size
+                                                    ];
+                                                    arr[i].name = n;
+                                                    if (isDupAt(arr, i))
+                                                        alert(
+                                                            `Tên size "${n}" đã tồn tại.`
+                                                        );
+                                                }}
+                                            />
+                                            <input
+                                                type='number'
+                                                min={0}
+                                                value={s.quantity}
+                                                onChange={(e) =>
+                                                    changeSize(
+                                                        i,
+                                                        'quantity',
+                                                        e.target.value
                                                     )
-                                                ) {
-                                                    alert(
-                                                        `Tên size "${normalized}" đã tồn tại. Vui lòng đổi tên khác.`
-                                                    );
                                                 }
-                                            }}
-                                        />
-                                        <input
-                                            type='number'
-                                            min={0}
-                                            placeholder='Số lượng'
-                                            value={s.quantity}
-                                            onChange={(e) => {
-                                                const val = Math.max(
-                                                    0,
-                                                    Number(e.target.value) || 0
-                                                );
-                                                handleSizeChange(
-                                                    i,
-                                                    'quantity',
-                                                    val
-                                                );
-                                            }}
-                                        />
-                                        <button
-                                            type='button'
-                                            onClick={() => removeSizeRow(i)}
-                                        >
-                                            Xóa
-                                        </button>
-                                    </div>
-                                ))}
-                                <button type='button' onClick={addSizeRow}>
-                                    + Thêm size
-                                </button>
+                                                placeholder='Số lượng'
+                                            />
+                                            <button
+                                                className={btnGhost}
+                                                type='button'
+                                                onClick={() => removeSize(i)}
+                                            >
+                                                Xóa
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        className={btnGhost}
+                                        type='button'
+                                        onClick={addSize}
+                                    >
+                                        + Thêm size
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-                        <div className={formActions}>
+                        <div className={actions}>
                             <button
-                                onClick={handleSaveProduct}
-                                disabled={loading}
+                                className={btnPrimary}
+                                onClick={saveProduct}
+                                disabled={loadingData}
                             >
-                                {loading ? 'Đang lưu...' : 'Lưu sản phẩm'}
+                                {loadingData ? 'Đang lưu…' : 'Lưu'}
                             </button>
                             <button
-                                type='button'
+                                className={btnGhost}
                                 onClick={() => setShowForm(false)}
-                                disabled={loading}
+                                disabled={loadingData}
                             >
                                 Hủy
                             </button>
                         </div>
                     </div>
-                )}
-                {/* Bảng sản phẩm */}
-                <div className={overflowItem}>
-                    <table className={producttable}>
-                        <thead>
-                            <tr>
-                                <th>HÌNH ẢNH</th>
-                                <th>VẬT LIỆU</th>
-                                <th>TÊN SẢN PHẨM</th>
-                                <th>GIÁ (VNĐ)</th>
-                                <th>TỒN KHO</th>
-                                <th>HÀNH ĐỘNG</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map((p) => (
-                                <tr key={p._id}>
-                                    <td>
-                                        <div className={imgplaceholder}>
-                                            <img src={p.images?.[0]} alt='' />
-                                        </div>
-                                    </td>
-                                    <td>{p.material}</td>
-                                    <td>{p.name}</td>
-                                    <td>{formatCurrency(p.price)}</td>
-                                    <td>
-                                        {(p.size || [])
-                                            .map(
-                                                (s) =>
-                                                    `${s.name}: ${s.quantity}`
-                                            )
-                                            .join(', ')}
-                                        {` (Tổng: ${totalQty(p)})`}
-                                    </td>
-                                    <td>
+                </section>
+            )}
+
+            {/* Danh sách */}
+            <div className={tableWrap}>
+                <table className={producttable}>
+                    <thead>
+                        <tr>
+                            <th>HÌNH ẢNH</th>
+                            <th>LOẠI</th>
+                            <th>TÊN</th>
+                            <th>GIÁ (VNĐ)</th>
+                            <th>TỒN KHO</th>
+                            <th>HÀNH ĐỘNG</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filtered.map((p) => (
+                            <tr key={p._id}>
+                                <td>
+                                    <div className={imgplaceholder}>
+                                        <img
+                                            src={p.images?.[0]}
+                                            alt={p.name || ''}
+                                        />
+                                    </div>
+                                </td>
+                                <td>
+                                    <span className={pill}>
+                                        {p.type || '—'}
+                                    </span>
+                                    <span className={pillMuted}>
+                                        {p.material || ''}
+                                    </span>
+                                </td>
+                                <td>{p.name}</td>
+                                <td>{vnd(p.price)}</td>
+                                <td>
+                                    {(p.size || [])
+                                        .map((s) => `${s.name}:${s.quantity}`)
+                                        .join(', ')}{' '}
+                                    {` (Tổng: ${totalQty(p)})`}
+                                </td>
+                                <td>
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            gap: 8,
+                                            flexWrap: 'wrap'
+                                        }}
+                                    >
                                         <button
-                                            className={btnedit}
-                                            onClick={() => handleOpenEdit(p)}
+                                            className={`${btnGhost} ${btnSmall}`}
+                                            onClick={() => openEdit(p)}
                                         >
                                             Sửa
                                         </button>
                                         <button
-                                            className={btnedit}
-                                            onClick={() => openStockModal(p)}
-                                            title='Tăng/giảm tồn theo size'
+                                            className={`${btnGhost} ${btnSmall}`}
+                                            onClick={() => openStock(p)}
+                                            title='Điều chỉnh tồn theo size'
                                         >
                                             Chỉnh size
                                         </button>
                                         <button
-                                            className={btndelete}
-                                            onClick={() =>
-                                                handleDeleteProduct(p._id)
-                                            }
+                                            className={`${btnWarn} ${btnSmall}`}
+                                            onClick={() => deleteProd(p._id)}
                                         >
                                             Xóa
                                         </button>
                                         <button
-                                            className={btnedit}
-                                            onClick={() => openHistory(p)}
+                                            className={`${btnGhost} ${btnSmall}`}
+                                            onClick={() =>
+                                                setOpenHistoryFor(p._id)
+                                            }
                                         >
                                             Lịch sử
                                         </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {products.length < total && (
-                                <tr>
-                                    <td
-                                        colSpan={6}
-                                        style={{ textAlign: 'center' }}
-                                    >
-                                        <MyButton
-                                            content={'Xem thêm'}
-                                            onClick={hangleLoadMore}
-                                        />
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        {filtered.length === 0 && (
+                            <tr>
+                                <td colSpan={6}>
+                                    <div className={empty}>
+                                        Không tìm thấy sản phẩm phù hợp.
+                                    </div>
+                                </td>
+                            </tr>
+                        )}
+                        {filtered.length && products.length < total ? (
+                            <tr>
+                                <td colSpan={6} style={{ textAlign: 'center' }}>
+                                    <MyButton
+                                        content={'Xem thêm'}
+                                        onClick={hangleLoadMore}
+                                    />
+                                </td>
+                            </tr>
+                        ) : null}
+                    </tbody>
+                </table>
             </div>
-            {/* Modal Chỉnh size */}
-            {showStockModal && stockProduct && (
+
+            {loadingData && <div className={loading}>Đang tải dữ liệu…</div>}
+
+            {/* Modal chỉnh size */}
+            {stockOpen && stockProduct && (
                 <div
-                    className={styles.modalBackdrop}
-                    onClick={() => setShowStockModal(false)}
+                    className={modalBackdrop}
+                    onClick={() => setStockOpen(false)}
                 >
                     <div
-                        className={styles.modalCard}
+                        className={modalCard}
                         onClick={(e) => e.stopPropagation()}
+                        role='dialog'
+                        aria-modal='true'
                     >
-                        <h3>Chỉnh số lượng — {stockProduct.name}</h3>
-
-                        <div className={styles.modalSection}>
-                            <div className={styles.sizeGridHeader}>
-                                <span>Size</span>
-                                <span>Tồn hiện tại</span>
-                                <span>Điều chỉnh (±)</span>
-                                <span>Tồn sau chỉnh</span>
+                        <div className={modalHead}>
+                            Chỉnh số lượng — {stockProduct.name}
+                        </div>
+                        <div className={modalBody}>
+                            <div className={sizeGrid}>
+                                <div className={sizeRow}>
+                                    <strong>Size</strong>
+                                    <strong>Tồn</strong>
+                                    <strong>Điều chỉnh (±)</strong>
+                                    <strong>Sau chỉnh</strong>
+                                </div>
+                                {(stockProduct.size || []).map((s, idx) => {
+                                    const delta = deltas[idx]?.delta || 0;
+                                    const after =
+                                        (Number(s.quantity) || 0) +
+                                        (Number(delta) || 0);
+                                    return (
+                                        <div key={idx} className={sizeRow}>
+                                            <span>{s.name}</span>
+                                            <span>{s.quantity}</span>
+                                            <input
+                                                type='number'
+                                                value={delta}
+                                                onChange={(e) =>
+                                                    setDelta(
+                                                        idx,
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder='VD: +5 hoặc -2'
+                                            />
+                                            <span
+                                                className={
+                                                    after < 0 ? negative : ''
+                                                }
+                                            >
+                                                {after}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                             </div>
-
-                            {(stockProduct.size || []).map((s, idx) => {
-                                const delta = sizeDeltas[idx]?.delta || 0;
-                                const after =
-                                    (Number(s.quantity) || 0) +
-                                    (Number(delta) || 0);
-                                return (
-                                    <div
-                                        key={idx}
-                                        className={styles.sizeGridRow}
-                                    >
-                                        <span>{s.name}</span>
-                                        <span>{s.quantity}</span>
-                                        <input
-                                            type='number'
-                                            value={delta}
-                                            onChange={(e) =>
-                                                changeDelta(idx, e.target.value)
-                                            }
-                                            placeholder='VD: +5 hoặc -2'
-                                        />
-                                        <span
-                                            className={
-                                                after < 0 ? styles.negative : ''
-                                            }
-                                        >
-                                            {after}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <div className={styles.modalSection}>
-                            <label>Lý do</label>
-                            <select
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
+                            <div
+                                style={{
+                                    display: 'grid',
+                                    gap: 8,
+                                    marginTop: 12
+                                }}
                             >
-                                <option value='restock'>
-                                    Nhập hàng (restock)
-                                </option>
-                                <option value='inventory_adjustment'>
-                                    Điều chỉnh kiểm kê
-                                </option>
-                                <option value='fix_error'>
-                                    Sửa sai số liệu
-                                </option>
-                                <option value='other'>Khác</option>
-                            </select>
-                            <label style={{ marginTop: 8 }}>Ghi chú</label>
-                            <input
-                                type='text'
-                                placeholder='Ví dụ: nhận lại hàng lỗi, kiểm kê kho, ...'
-                                value={note}
-                                onChange={(e) => setNote(e.target.value)}
-                            />
+                                <label>
+                                    Lý do
+                                    <select
+                                        value={reason}
+                                        onChange={(e) =>
+                                            setReason(e.target.value)
+                                        }
+                                    >
+                                        <option value='restock'>
+                                            Nhập hàng
+                                        </option>
+                                        <option value='inventory_adjustment'>
+                                            Điều chỉnh kiểm kê
+                                        </option>
+                                        <option value='fix_error'>
+                                            Sửa sai số liệu
+                                        </option>
+                                        <option value='other'>Khác</option>
+                                    </select>
+                                </label>
+                                <label>
+                                    Ghi chú
+                                    <input
+                                        value={note}
+                                        onChange={(e) =>
+                                            setNote(e.target.value)
+                                        }
+                                        placeholder='Ví dụ: nhận lại hàng lỗi…'
+                                    />
+                                </label>
+                            </div>
                         </div>
-
-                        <div className={styles.modalActions}>
-                            <button onClick={() => setShowStockModal(false)}>
+                        <div className={modalFoot}>
+                            <button
+                                className={btnGhost}
+                                onClick={() => setStockOpen(false)}
+                            >
                                 Hủy
                             </button>
                             <button
-                                onClick={submitAdjustStock}
+                                className={btnPrimary}
+                                onClick={submitAdjust}
                                 disabled={
-                                    loading || !hasAnyChange || hasNegativeAfter
+                                    loadingData || !anyChange || invalidAfter
                                 }
                             >
-                                {loading ? 'Đang lưu...' : 'Xác nhận'}
+                                {loadingData ? 'Đang lưu…' : 'Xác nhận'}
                             </button>
                         </div>
                     </div>
@@ -678,26 +771,32 @@ function ProductAdmin() {
 
             {/* Drawer lịch sử */}
             {openHistoryFor && (
-                <div className={styles.drawer} role='dialog' aria-modal='true'>
-                    <div className={styles.drawerHeader}>
+                <aside className={drawer} role='dialog' aria-modal='true'>
+                    <div className={drawerHead}>
                         <strong>Lịch sử điều chỉnh</strong>
-                        <div className={styles.drawerHeaderActions}>
+                        <div style={{ display: 'flex', gap: 8 }}>
                             <button
+                                className={btnGhost}
                                 onClick={() => {
                                     clearHistory(openHistoryFor);
                                 }}
                             >
                                 Xóa lịch sử
                             </button>
-                            <button onClick={closeHistory}>Đóng</button>
+                            <button
+                                className={btnPrimary}
+                                onClick={() => setOpenHistoryFor(null)}
+                            >
+                                Đóng
+                            </button>
                         </div>
                     </div>
-                    <div className={styles.drawerBody}>
+                    <div className={drawerBody}>
                         {(() => {
                             const logs = getHistory(openHistoryFor);
                             if (!logs.length) return <em>Chưa có lịch sử.</em>;
                             return (
-                                <ul className={styles.historyList}>
+                                <ul className={historyList}>
                                     {logs.map((r) => {
                                         const when = new Date(
                                             r.at
@@ -705,71 +804,55 @@ function ProductAdmin() {
                                         return (
                                             <li
                                                 key={r.id}
-                                                className={styles.historyItem}
+                                                className={historyItem}
                                             >
                                                 <div
-                                                    className={
-                                                        styles.historyHeader
-                                                    }
+                                                    style={{
+                                                        display: 'flex',
+                                                        gap: 6,
+                                                        flexWrap: 'wrap'
+                                                    }}
                                                 >
-                                                    <span
-                                                        className={styles.tag}
-                                                    >
+                                                    <span className={chip}>
                                                         {when}
                                                     </span>
-                                                    <span
-                                                        className={styles.tag}
-                                                    >
+                                                    <span className={chip}>
                                                         {r.by}
                                                     </span>
-                                                    <span
-                                                        className={styles.tag}
-                                                    >
+                                                    <span className={chip}>
                                                         {r.reason}
                                                     </span>
                                                     {r.note ? (
                                                         <span
                                                             className={
-                                                                styles.tagMuted
+                                                                chipMuted
                                                             }
                                                         >
                                                             {r.note}
                                                         </span>
                                                     ) : null}
                                                 </div>
-                                                <div
-                                                    className={
-                                                        styles.historyChanges
-                                                    }
-                                                >
+                                                <div style={{ marginTop: 6 }}>
                                                     {r.changes.map((c, i) => (
                                                         <div
                                                             key={i}
-                                                            className={
-                                                                styles.changeRow
-                                                            }
+                                                            style={{
+                                                                display: 'grid',
+                                                                gridTemplateColumns:
+                                                                    '60px 1fr 1fr',
+                                                                gap: 8,
+                                                                fontSize: 14
+                                                            }}
                                                         >
-                                                            <span
-                                                                className={
-                                                                    styles.changeSize
-                                                                }
-                                                            >
+                                                            <span>
                                                                 {c.name}
                                                             </span>
-                                                            <span
-                                                                className={
-                                                                    styles.changeDelta
-                                                                }
-                                                            >
+                                                            <span>
                                                                 {c.delta > 0
                                                                     ? `+${c.delta}`
                                                                     : c.delta}
                                                             </span>
-                                                            <span
-                                                                className={
-                                                                    styles.changeAfter
-                                                                }
-                                                            >
+                                                            <span>
                                                                 {typeof c.before ===
                                                                 'number'
                                                                     ? `(${c.before} → ${c.after})`
@@ -785,7 +868,7 @@ function ProductAdmin() {
                             );
                         })()}
                     </div>
-                </div>
+                </aside>
             )}
         </div>
     );

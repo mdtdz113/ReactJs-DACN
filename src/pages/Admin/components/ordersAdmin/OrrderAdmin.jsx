@@ -1,26 +1,22 @@
-import { getAllOrderAdmin, updateOrderStatus } from '@/apis/orderService';
-import Cookies from 'js-cookie';
 import { useEffect, useMemo, useState } from 'react';
+import Cookies from 'js-cookie';
 import styles from './styles.module.scss';
-import {
-    LineChart,
-    Line,
-    CartesianGrid,
-    XAxis,
-    YAxis,
-    Tooltip,
-    Legend,
-    ResponsiveContainer
-} from 'recharts';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { getAllOrderAdmin, updateOrderStatus } from '@/apis/orderService';
 
 function OrderAdmin() {
     const {
-        ListOrders,
-        topBar,
+        container,
+        topBarResponsive,
+        tabRow,
         statusBtn,
         statusBtnActive,
+        rightActions,
+        controlRow,
+        searchInput,
+        selectInput,
+        card,
+        tableWrap,
+        table,
         actionsCell,
         confirmLink,
         deleteLink,
@@ -29,30 +25,34 @@ function OrderAdmin() {
         badgeShipped,
         badgeDelivered,
         badgeCancelled,
-        chartBox
+        // NEW: pagination styles
+        paginationBar,
+        pageControls,
+        pageBtn,
+        pageInfo,
+        pageSizeSelect
     } = styles;
 
-    const [orders, setOrders] = useState([]);
-    const [activeStatus, setActiveStatus] = useState('all'); // mặc định = all
-    const [loading, setLoading] = useState(false);
     const token = Cookies.get('token');
-    const [chartData, setChartData] = useState([]);
-    const [filterType, setFilterType] = useState('day'); // day, month, year, custom
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+
+    const [orders, setOrders] = useState([]);
+    const [activeStatus, setActiveStatus] = useState('all');
+    const [loading, setLoading] = useState(false);
+
+    // Tìm kiếm + sắp xếp (đã có trước đó)
+    const [sortBy, setSortBy] = useState('date_desc'); // date_desc | date_asc | name_asc
+    const [search, setSearch] = useState('');
+
+    // NEW: Phân trang (client-side)
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
     const fetchOrders = async (status) => {
         setLoading(true);
         try {
             let queryStatus = status;
-
-            if (status === 'pending') {
-                queryStatus = ['pending', 'completed'];
-            }
-            if (status === 'all') {
-                queryStatus = undefined;
-            }
-
+            if (status === 'pending') queryStatus = ['pending', 'completed'];
+            if (status === 'all') queryStatus = undefined;
             const { data } = await getAllOrderAdmin(token, {
                 status: queryStatus
             });
@@ -64,6 +64,8 @@ function OrderAdmin() {
 
     useEffect(() => {
         fetchOrders(activeStatus);
+        // reset về trang 1 khi đổi tab
+        setPage(1);
     }, [activeStatus]);
 
     const statusLabel = (s) => {
@@ -125,6 +127,74 @@ function OrderAdmin() {
         }
     };
 
+    // Lọc + sắp xếp
+    const filteredSorted = useMemo(() => {
+        let list = [...orders];
+
+        const q = search.trim().toLowerCase();
+        if (q) {
+            list = list.filter((o) => {
+                const code = (o.code || (o._id ? o._id.slice(-6) : '') || '')
+                    .toString()
+                    .toLowerCase();
+                const email = (o.email || '').toString().toLowerCase();
+                const phone = (
+                    o.phone ||
+                    o.phoneNumber ||
+                    o.mobile ||
+                    o.tel ||
+                    ''
+                )
+                    .toString()
+                    .toLowerCase();
+                return (
+                    code.includes(q) || email.includes(q) || phone.includes(q)
+                );
+            });
+        }
+
+        list.sort((a, b) => {
+            const nameA = (
+                [a.firstName, a.lastName].filter(Boolean).join(' ') ||
+                a.name ||
+                ''
+            ).toLowerCase();
+            const nameB = (
+                [b.firstName, b.lastName].filter(Boolean).join(' ') ||
+                b.name ||
+                ''
+            ).toLowerCase();
+            const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+
+            if (sortBy === 'name_asc') return nameA.localeCompare(nameB);
+            if (sortBy === 'date_asc') return timeA - timeB;
+            return timeB - timeA; // date_desc
+        });
+
+        return list;
+    }, [orders, search, sortBy]);
+
+    // Tính trang hiện tại
+    const totalItems = filteredSorted.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+    // Nếu thay đổi lọc/sort/search làm số trang giảm, đảm bảo trang hiện tại hợp lệ
+    useEffect(() => {
+        setPage(1);
+    }, [search, sortBy]);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+    }, [totalPages, page]);
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = Math.min(startIndex + pageSize, totalItems);
+    const pageItems = useMemo(
+        () => filteredSorted.slice(startIndex, endIndex),
+        [filteredSorted, startIndex, endIndex]
+    );
+
     const tabs = useMemo(
         () => [
             { key: 'all', label: 'Tất cả' },
@@ -137,203 +207,261 @@ function OrderAdmin() {
         []
     );
 
-    useEffect(() => {
-        if (!orders || orders.length === 0) return;
-
-        let grouped = {};
-        orders.forEach((order) => {
-            const date = new Date(order.createdAt);
-            let key = '';
-
-            if (filterType === 'day') key = date.toLocaleDateString();
-            else if (filterType === 'month')
-                key = `${date.getMonth() + 1}/${date.getFullYear()}`;
-            else if (filterType === 'year') key = `${date.getFullYear()}`;
-            else key = date.toLocaleDateString();
-
-            if (filterType === 'custom' && startDate && endDate) {
-                if (date < startDate || date > endDate) return;
-            }
-
-            grouped[key] = (grouped[key] || 0) + 1;
-        });
-
-        const result = Object.entries(grouped).map(([key, value]) => ({
-            label: key,
-            count: value
-        }));
-
-        setChartData(result);
-    }, [orders, filterType, startDate, endDate]);
-
     return (
-        <div style={{ display: 'flex', gap: '20px' , width: '1700px'}}>
-            {/* Bảng đơn hàng bên trái */}
-            <div style={{ flex: 2 }}>
-                <div className={topBar}>
+        <div className={container}>
+            {/* Tabs + GIỮ NGUYÊN 2 NÚT CŨ */}
+            <div className={topBarResponsive}>
+                <div className={tabRow}>
                     {tabs.map((t) => (
                         <button
                             key={t.key}
+                            type='button'
                             className={`${statusBtn} ${activeStatus === t.key ? statusBtnActive : ''}`}
                             onClick={() => setActiveStatus(t.key)}
                             disabled={loading && activeStatus === t.key}
-                            type='button'
                         >
                             {t.label}
                         </button>
                     ))}
-
-                    <div
-                        style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}
-                    >
-                        <button
-                            type='button'
-                            onClick={() =>
-                                window.open(
-                                    '/admin/orders/invoices?status=completed',
-                                    '_blank'
-                                )
-                            }
-                        >
-                            Đã thanh toán
-                        </button>
-                        <button
-                            type='button'
-                            onClick={() =>
-                                window.open(
-                                    '/admin/orders/invoices?status=pending',
-                                    '_blank'
-                                )
-                            }
-                        >
-                            Chưa thanh toán
-                        </button>
-                    </div>
                 </div>
-
-                <div className={ListOrders}>
-                    {loading ? (
-                        <p>Đang tải...</p>
-                    ) : (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Order</th>
-                                    <th>Khách hàng</th>
-                                    <th>Địa chỉ</th>
-                                    <th>Email</th>
-                                    <th>Tổng tiền</th>
-                                    <th>Trạng thái</th>
-                                    <th className={actionsCell}>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orders.map((item) => (
-                                    <tr key={item._id}>
-                                        <td>
-                                            #{item.code || item._id.slice(-6)}
-                                        </td>
-                                        <td>
-                                            {item.firstName} {item.lastName}
-                                        </td>
-                                        <td>{item.cities}</td>
-                                        <td>{item.email}</td>
-                                        <td>{item.totalAmount}</td>
-                                        <td>{statusLabel(item.status)}</td>
-                                        <td className={actionsCell}>
-                                            {nextStatusForConfirm(
-                                                item.status
-                                            ) && (
-                                                <button
-                                                    className={confirmLink}
-                                                    onClick={() =>
-                                                        handleConfirm(item)
-                                                    }
-                                                >
-                                                    Xác nhận
-                                                </button>
-                                            )}
-                                            {(item.status === 'pending' ||
-                                                item.status ===
-                                                    'completed') && (
-                                                <button
-                                                    className={deleteLink}
-                                                    type='button'
-                                                    onClick={() =>
-                                                        handleCancel(item)
-                                                    }
-                                                >
-                                                    Xóa
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {orders.length === 0 && (
-                                    <tr>
-                                        <td
-                                            colSpan={7}
-                                            style={{ textAlign: 'center' }}
-                                        >
-                                            Không có đơn nào
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    )}
+                <div className={rightActions}>
+                    <button
+                        type='button'
+                        onClick={() =>
+                            window.open(
+                                '/admin/orders/invoices?status=completed',
+                                '_blank'
+                            )
+                        }
+                    >
+                        Đã thanh toán
+                    </button>
+                    <button
+                        type='button'
+                        onClick={() =>
+                            window.open(
+                                '/admin/orders/invoices?status=pending',
+                                '_blank'
+                            )
+                        }
+                    >
+                        Chưa thanh toán
+                    </button>
                 </div>
             </div>
 
-            {/* Biểu đồ bên phải */}
-            <div className={chartBox} style={{ flex: 1 }}>
-                <h3>Thống kê đơn hàng</h3>
-                <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-                    <select
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                    >
-                        <option value='day'>Theo ngày</option>
-                        <option value='month'>Theo tháng</option>
-                        <option value='year'>Theo năm</option>
-                        <option value='custom'>Khoảng ngày</option>
-                    </select>
-                    {filterType === 'custom' && (
-                        <div style={{ display: 'flex', gap: 10 }}>
-                            <DatePicker
-                                selected={startDate}
-                                onChange={setStartDate}
-                                selectsStart
-                                startDate={startDate}
-                                endDate={endDate}
-                                placeholderText='Từ ngày'
-                            />
-                            <DatePicker
-                                selected={endDate}
-                                onChange={setEndDate}
-                                selectsEnd
-                                startDate={startDate}
-                                endDate={endDate}
-                                placeholderText='Đến ngày'
-                            />
-                        </div>
+            {/* Tìm kiếm + sắp xếp */}
+            <div className={`${card} ${controlRow}`}>
+                <input
+                    className={searchInput}
+                    type='text'
+                    placeholder='Tìm theo mã đơn / email / SĐT…'
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <select
+                    className={selectInput}
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                >
+                    <option value='date_desc'>Ngày: Mới → Cũ</option>
+                    <option value='date_asc'>Ngày: Cũ → Mới</option>
+                    <option value='name_asc'>Tên: A → Z</option>
+                </select>
+            </div>
+
+            {/* Bảng + phân trang */}
+            <div className={card}>
+                <div className={tableWrap}>
+                    {loading ? (
+                        <p>Đang tải...</p>
+                    ) : (
+                        <>
+                            <table className={table}>
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Khách hàng</th>
+                                        <th className='hide-sm'>Địa chỉ</th>
+                                        <th>Email</th>
+                                        <th className='hide-sm'>SĐT</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th className={actionsCell}>
+                                            Hành động
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pageItems.map((item) => {
+                                        const fullName =
+                                            [item.firstName, item.lastName]
+                                                .filter(Boolean)
+                                                .join(' ') ||
+                                            item.name ||
+                                            '';
+                                        const code =
+                                            item.code ||
+                                            (item._id
+                                                ? item._id.slice(-6)
+                                                : '');
+                                        const phone =
+                                            item.phone ||
+                                            item.phoneNumber ||
+                                            item.mobile ||
+                                            item.tel ||
+                                            '';
+                                        return (
+                                            <tr key={item._id}>
+                                                <td>#{code}</td>
+                                                <td>{fullName}</td>
+                                                <td className='hide-sm'>
+                                                    {item.cities ||
+                                                        item.address ||
+                                                        ''}
+                                                </td>
+                                                <td>{item.email}</td>
+                                                <td className='hide-sm'>
+                                                    {phone}
+                                                </td>
+                                                <td>{item.totalAmount}</td>
+                                                <td>
+                                                    {statusLabel(item.status)}
+                                                </td>
+                                                <td className={actionsCell}>
+                                                    {nextStatusForConfirm(
+                                                        item.status
+                                                    ) && (
+                                                        <button
+                                                            type='button'
+                                                            className={
+                                                                confirmLink
+                                                            }
+                                                            onClick={() =>
+                                                                handleConfirm(
+                                                                    item
+                                                                )
+                                                            }
+                                                        >
+                                                            Xác nhận
+                                                        </button>
+                                                    )}
+                                                    {(item.status ===
+                                                        'pending' ||
+                                                        item.status ===
+                                                            'completed') && (
+                                                        <button
+                                                            type='button'
+                                                            className={
+                                                                deleteLink
+                                                            }
+                                                            onClick={() =>
+                                                                handleCancel(
+                                                                    item
+                                                                )
+                                                            }
+                                                        >
+                                                            Hủy
+                                                        </button>
+                                                    )}
+                                                    {/* KHÔNG đụng vào nút In gốc của bạn */}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                    {!loading && pageItems.length === 0 && (
+                                        <tr>
+                                            <td
+                                                colSpan={8}
+                                                style={{ textAlign: 'center' }}
+                                            >
+                                                Không có đơn nào
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+
+                            {/* Pagination bar */}
+                            <div
+                                className={paginationBar}
+                                aria-label='Phân trang đơn hàng'
+                            >
+                                <div className={pageInfo}>
+                                    Hiển thị{' '}
+                                    <b>
+                                        {totalItems ? startIndex + 1 : 0}-
+                                        {endIndex}
+                                    </b>{' '}
+                                    / <b>{totalItems}</b> đơn
+                                </div>
+                                <div className={pageControls}>
+                                    <button
+                                        type='button'
+                                        className={pageBtn}
+                                        onClick={() => setPage(1)}
+                                        disabled={page === 1}
+                                        aria-label='Trang đầu'
+                                    >
+                                        «
+                                    </button>
+                                    <button
+                                        type='button'
+                                        className={pageBtn}
+                                        onClick={() =>
+                                            setPage((p) => Math.max(1, p - 1))
+                                        }
+                                        disabled={page === 1}
+                                        aria-label='Trang trước'
+                                    >
+                                        Trước
+                                    </button>
+
+                                    <span>
+                                        Trang {page}/{totalPages}
+                                    </span>
+
+                                    <button
+                                        type='button'
+                                        className={pageBtn}
+                                        onClick={() =>
+                                            setPage((p) =>
+                                                Math.min(totalPages, p + 1)
+                                            )
+                                        }
+                                        disabled={page === totalPages}
+                                        aria-label='Trang sau'
+                                    >
+                                        Sau
+                                    </button>
+                                    <button
+                                        type='button'
+                                        className={pageBtn}
+                                        onClick={() => setPage(totalPages)}
+                                        disabled={page === totalPages}
+                                        aria-label='Trang cuối'
+                                    >
+                                        »
+                                    </button>
+
+                                    <select
+                                        className={pageSizeSelect}
+                                        value={pageSize}
+                                        onChange={(e) => {
+                                            setPage(1);
+                                            setPageSize(Number(e.target.value));
+                                        }}
+                                        aria-label='Số dòng mỗi trang'
+                                    >
+                                        <option value='10'>10 / trang</option>
+                                        <option value='20'>20 / trang</option>
+                                        <option value='50'>50 / trang</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </>
                     )}
                 </div>
-                <ResponsiveContainer width='100%' height={300}>
-                    <LineChart data={chartData}>
-                        <CartesianGrid stroke='#ccc' />
-                        <XAxis dataKey='label' />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line
-                            type='monotone'
-                            dataKey='count'
-                            stroke='#2563eb'
-                            strokeWidth={2}
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
             </div>
         </div>
     );

@@ -10,9 +10,10 @@ import Cookies from 'js-cookie';
 import { SideBarContext } from '@/context/SideBarProvider';
 import { StoreContext } from '@/context/storeProvider';
 import { useNavigate } from 'react-router-dom';
-
+import { GoogleLogin } from '@react-oauth/google';
+import { requestLoginGoogle } from '@/apis/authSercice';
 function Login() {
-    const { container, title, boxRememberMe, lostPw } = styles;
+    const { container, title, boxRememberMe, lostPw, containerGoogle } = styles;
     const [isRegister, setIsRegester] = useState(false);
     const { toast } = useContext(ToastContext);
     const [isLoading, setIsLoading] = useState(false);
@@ -88,6 +89,38 @@ function Login() {
         formik.resetForm();
     };
 
+    const handleSuccess = async (response) => {
+        const { credential } = response;
+        try {
+            const { token, refreshToken, id, role, username } =
+                await requestLoginGoogle(credential);
+
+            // Lưu giống y như luồng login thường
+            Cookies.set('userId', id);
+            Cookies.set('token', token);
+            Cookies.set('refreshToken', refreshToken);
+
+            // cập nhật context/state
+            setUserId(id);
+            setIsOpen(false);
+            hangleGetListProductCart?.(id, 'cart');
+
+            // điều hướng
+            if (role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
+
+            toast.success('Đăng nhập Google thành công');
+            // tuỳ bạn có muốn reload:
+            // window.location.reload();
+        } catch (error) {
+            console.error(error);
+            toast.error('Đăng nhập Google thất bại');
+        }
+    };
+
     return (
         <div className={container}>
             <div className={title}>{isRegister ? 'ĐĂNG KÝ' : 'ĐĂNG NHẬP'}</div>
@@ -141,6 +174,14 @@ function Login() {
                 />
                 {!isRegister && <div className={lostPw}>Quên mật khẩu?</div>}
             </form>
+            <div className={containerGoogle}>
+                <GoogleLogin
+                    onSuccess={handleSuccess}
+                    onError={() => {
+                        console.log('Login Failed');
+                    }}
+                />
+            </div>
         </div>
     );
 }

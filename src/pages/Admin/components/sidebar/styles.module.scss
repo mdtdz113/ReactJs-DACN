@@ -1,34 +1,134 @@
-.container {
-    width: 220px;
-    height: 100vh;
-    background: #1e1e2f;
+:root {
+    --sb-bg: #0f172a; /* nền tối hiện đại */
+    --sb-panel: #111827e6; /* translucent */
+    --sb-text: #e5e7eb;
+    --sb-muted: #9ca3af;
+    --sb-ring: #93c5fd; /* focus ring */
+    --sb-brand1: #6366f1; /* indigo */
+    --sb-brand2: #22d3ee; /* cyan */
+    --sb-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    --sb-radius: 12px;
+}
+
+.sidebar {
+    position: sticky;
+    top: 56px; /* dưới header */
+    height: calc(100vh - 56px);
+    width: 200px;
+    background: linear-gradient(
+        180deg,
+        rgba(17, 24, 39, 0.88),
+        rgba(17, 24, 39, 0.72)
+    );
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(6px);
+    transition: width 0.25s ease;
+}
+.collapsed {
+    width: 76px;
+}
+
+.sidebarHeader {
     display: flex;
-    flex-direction: column;
-    padding: 20px 0;
+    justify-content: flex-end;
+    padding: 8px;
+}
+.collapseBtn {
+    appearance: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--sb-text);
+    border-radius: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+.collapseBtn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+.collapseBtn:focus-visible {
+    outline: 2px solid var(--sb-ring);
+    outline-offset: 2px;
+}
+
+.menu {
+    display: grid;
+    gap: 6px;
+    padding: 8px;
 }
 
 .item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 28px 1fr;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    font-size: 15px;
-    color: #b0b3c1;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover {
-        background: #2d2f36;
-        color: #ffffff;
-    }
+    color: var(--sb-text);
+    border: 1px solid transparent;
+    background: transparent;
+    text-align: left;
+    position: relative;
+}
+.item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+.item:focus-visible {
+    outline: 2px solid var(--sb-ring);
+    outline-offset: 2px;
 }
 
 .active {
-    background: #2d2f36;
-    border-left: 4px solid #4e73df;
-    color: #ffffff;
+    background: linear-gradient(
+        90deg,
+        rgba(99, 102, 241, 0.18),
+        rgba(34, 211, 238, 0.18)
+    );
+    border-color: rgba(99, 102, 241, 0.45);
 }
 
 .icon {
+    display: inline-grid;
+    place-items: center;
     font-size: 18px;
+    opacity: 0.92;
+}
+.label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Tooltip khi thu gọn */
+.tooltip {
+    pointer-events: none;
+    position: absolute;
+    left: 74px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(17, 24, 39, 0.98);
+    color: var(--sb-text);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: var(--sb-shadow);
+    font-size: 12px;
+    opacity: 0;
+    translate: 0 2px;
+    transition:
+        opacity 0.15s ease,
+        translate 0.15s ease;
+}
+.collapsed .item:hover .tooltip {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* Tôn trọng người dùng giảm chuyển động */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
 }

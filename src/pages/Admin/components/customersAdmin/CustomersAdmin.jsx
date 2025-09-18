@@ -259,15 +259,7 @@ function CustomersAdmin() {
                                                 u.role
                                             )}
                                         </td>
-                                        <td>
-                                            <span
-                                                className={`${tag} ${u.isLocked ? tagLocked : tagOpen}`}
-                                            >
-                                                {u.isLocked
-                                                    ? 'Đã khóa'
-                                                    : 'Đang mở'}
-                                            </span>
-                                        </td>
+
                                         <td className={actions}>
                                             {editing === u._id ? (
                                                 <>
@@ -300,6 +292,18 @@ function CustomersAdmin() {
                                                     >
                                                         Sửa
                                                     </button>
+
+                                                    <button
+                                                        className={`${btn} ${btnDanger}`}
+                                                        type='button'
+                                                        onClick={() =>
+                                                            onDelete(u._id)
+                                                        }
+                                                        aria-label={`Xoá ${u.username}`}
+                                                    >
+                                                        Xóa
+                                                    </button>
+
                                                     <button
                                                         className={btn}
                                                         type='button'
@@ -312,18 +316,17 @@ function CustomersAdmin() {
                                                             ? 'Mở khóa'
                                                             : 'Khóa'}
                                                     </button>
-                                                    <button
-                                                        className={`${btn} ${btnDanger}`}
-                                                        type='button'
-                                                        onClick={() =>
-                                                            onDelete(u._id)
-                                                        }
-                                                        aria-label={`Xoá ${u.username}`}
-                                                    >
-                                                        Xóa
-                                                    </button>
                                                 </>
                                             )}
+                                        </td>
+                                        <td>
+                                            <span
+                                                className={`${tag} ${u.isLocked ? tagLocked : tagOpen}`}
+                                            >
+                                                {u.isLocked
+                                                    ? 'Đã khóa'
+                                                    : 'Đang mở'}
+                                            </span>
                                         </td>
                                     </tr>
                                 ))}

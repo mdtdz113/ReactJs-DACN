@@ -1,154 +1,285 @@
-@use '@styles/mixin.module.scss' as *;
-@use '@styles/variables.module.scss' as *;
-.topBar {
+/* ======= Layout & Responsive (bổ sung) ======= */
+.container {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 100%;
     padding: 12px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    width: 1200px;
+    box-sizing: border-box;
 }
 
-.statusBtn {
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
+.topBarResponsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.tabRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rightActions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.card {
     background: #fff;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-
-    &:hover {
-        background: #f3f4f6;
-    }
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    padding: 12px;
 }
 
+/* Hàng điều khiển */
+.controlRow {
+    display: grid;
+    grid-template-columns: 1fr minmax(180px, 220px);
+    gap: 10px;
+    align-items: center;
+}
+
+.searchInput {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0 12px;
+    outline: none;
+}
+.searchInput:focus {
+    border-color: #60a5fa; /* xanh dịu, tránh viền đen khó chịu */
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+
+.selectInput {
+    height: 40px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0 12px;
+    background: #fff;
+    outline: none;
+}
+.selectInput:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+
+/* Bảng */
+.tableWrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 920px; /* đảm bảo không vỡ bố cục, có thể cuộn ngang */
+}
+
+.table th,
+.table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+    text-align: left;
+}
+
+/* Nút trạng thái trên cùng */
+.statusBtn {
+    background: #f3f4f6;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.statusBtn:hover {
+    background: #e5e7eb;
+}
 .statusBtnActive {
     background: #2563eb;
     color: #fff;
     border-color: #2563eb;
 }
 
-.ListOrders {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    overflow: hidden;
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-
-        thead {
-            background: #f3f4f6;
-            th {
-                padding: 10px;
-                text-align: left;
-                font-size: 14px;
-                color: #374151;
-            }
-        }
-
-        tbody {
-            tr {
-                border-top: 1px solid #e5e7eb;
-
-                &:hover {
-                    background: #f9fafb;
-                }
-
-                td {
-                    padding: 10px;
-                    font-size: 14px;
-                    color: #111827;
-                }
-            }
-        }
-    }
-}
-
-.actionsCell {
-    display: flex;
-    gap: 8px;
-}
-
-.confirmLink {
-    background: #10b981;
-    color: #fff;
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-
-    &:hover {
-        background: #059669;
-    }
-}
-
-.deleteLink {
-    background: #ef4444;
-    color: #fff;
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-
-    &:hover {
-        background: #dc2626;
-    }
-}
-
+/* Badge trạng thái */
 .badgePending {
     background: #fef3c7;
     color: #92400e;
-    padding: 2px 8px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
     font-size: 12px;
 }
 
 .badgeProcessing {
     background: #dbeafe;
     color: #1e40af;
-    padding: 2px 8px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
     font-size: 12px;
 }
 
 .badgeShipped {
     background: #e0f2fe;
-    color: #0369a1;
-    padding: 2px 8px;
-    border-radius: 6px;
+    color: #075985;
+    padding: 4px 10px;
+    border-radius: 999px;
     font-size: 12px;
 }
 
 .badgeDelivered {
     background: #dcfce7;
     color: #166534;
-    padding: 2px 8px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
     font-size: 12px;
 }
 
 .badgeCancelled {
     background: #fee2e2;
     color: #991b1b;
-    padding: 2px 8px;
-    border-radius: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
     font-size: 12px;
 }
 
-/* Biểu đồ */
-.chartBox {
-    background: #fff;
-    padding: 16px;
+/* Cột hành động */
+.actionsCell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.confirmLink,
+.deleteLink,
+.printLink {
+    border-radius: 10px;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+
+.confirmLink {
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+.confirmLink:hover {
+    background: #eff6ff;
+}
+
+.deleteLink {
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+.deleteLink:hover {
+    background: #fef2f2;
+}
+
+.printLink {
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+.printLink:hover {
+    background: #ecfdf5;
+}
+
+/* Ẩn cột trên màn nhỏ */
+.hide-sm {
+    display: none;
+}
+
+/* ======= Breakpoints ======= */
+@media (min-width: 640px) {
+    .hide-sm {
+        display: table-cell;
+    }
+    .controlRow {
+        grid-template-columns: 1.2fr 0.8fr;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        gap: 20px;
+        padding: 16px;
+    }
+    .table {
+        min-width: 1000px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .table {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .tabRow button {
+        font-size: 14px;
+        padding: 8px 10px;
+    }
+}
+
+/* ===== Pagination (bổ sung) ===== */
+.paginationBar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    padding-top: 12px;
+}
+
+.pageInfo {
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.pageControls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pageBtn {
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.pageBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pageSizeSelect {
+    height: 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 0 10px;
+    background: #fff;
+    outline: none;
+}
+.pageSizeSelect:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+
+@media (max-width: 480px) {
+    .paginationBar {
+        gap: 6px;
+    }
+    .pageInfo {
+        width: 100%;
+    }
 }

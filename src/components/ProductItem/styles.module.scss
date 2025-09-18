@@ -65,6 +65,16 @@
 .textPrice {
     text-align: left;
     margin: 6px 0px;
+    .pricetext{
+        @include flex_box_custom(left, center, 40px);
+        margin-right: 10px;
+
+        .priceold{
+            text-decoration: line-through;
+            color: gray;
+            font-size: 14px;
+        }
+    }
 }
 .boxSize {
     @include flex_box_custom(center, center, 10px);

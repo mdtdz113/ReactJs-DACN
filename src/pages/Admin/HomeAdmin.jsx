@@ -8,9 +8,10 @@ import SideBar from '@/pages/Admin/components/sidebar/SideBar';
 import { OurShopProvider } from '@/context/OurShopProvider';
 import CustomersAdmin from '@/pages/Admin/components/customersAdmin/CustomersAdmin';
 import OrderAdmin from '@/pages/Admin/components/ordersAdmin/OrrderAdmin';
+import Promotion from '@/pages/Admin/components/promotion/Promotion';
 
 function AdminHome() {
-    const { container } = styles;
+    const { container, content } = styles;
     const [selectedItem, setSelectedItem] = useState(1);
 
     // Hàm này sẽ được truyền xuống Sidebar để cập nhật state
@@ -27,6 +28,11 @@ function AdminHome() {
                 return <OrderAdmin />;
             case 4:
                 return <CustomersAdmin />;
+            case 5:
+                return <Promotion />;
+
+            default:
+                return <Dashboard />;
         }
     };
     return (
@@ -35,7 +41,7 @@ function AdminHome() {
 
             <div className={container}>
                 <SideBar onSelect={handleItemClick} selected={selectedItem} />
-                <div>{renderContent()} </div>
+                <div className={content}>{renderContent()} </div>
             </div>
         </OurShopProvider>
     );

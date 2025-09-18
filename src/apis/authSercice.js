@@ -28,6 +28,11 @@ const updateUser = (userId, payload) =>
 const lockUser = (userId, isLocked) =>
     axiosClient.put(`/user/${userId}/lock`, { isLocked });
 const createUser = (payload) => axiosClient.post(`/user/admin`, payload);
+
+const requestLoginGoogle = async (tokenGoogle) => {
+    const res = await axiosClient.post('/user/google', { tokenGoogle });
+    return res.data;
+};
 export {
     register,
     signIn,
@@ -36,5 +41,6 @@ export {
     deleteUser,
     updateUser,
     lockUser,
-    createUser
+    createUser,
+    requestLoginGoogle
 };

@@ -2,5 +2,13 @@
 @use '@styles/variables.module.scss' as *;
 
 .container {
-    @include flex_box_custom(left, flex-start, 0px);
+    display: flex;
+    width: 100%;
+    /* nếu có max-width cố định, bỏ đi để full bề ngang */
+}
+
+.content {
+    flex: 1;
+    min-width: 0; /* QUAN TRỌNG để grid không bị tràn và có thể co giãn */
+    padding: 10px; /* tùy chọn */
 }

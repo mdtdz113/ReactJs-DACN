@@ -1,0 +1,128 @@
+.wrapper {
+    padding: 20px;
+    background: #f9fafb;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h2 {
+        font-size: 1.5rem;
+        color: #333;
+    }
+
+    .addBtn {
+        background: #2563eb;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover {
+            background: #1d4ed8;
+        }
+    }
+}
+
+/* Grid 2 cột (auto responsive) */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
+
+    h3 {
+        margin-bottom: 10px;
+        color: #111;
+        font-size: 1.2rem;
+    }
+
+    p {
+        margin: 4px 0;
+        color: #555;
+    }
+
+    .percent {
+        font-weight: bold;
+        color: #16a34a;
+        margin-top: 8px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 14px;
+
+        button {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .detailBtn {
+            background: #f3f4f6;
+            color: #374151;
+
+            &:hover {
+                background: #e5e7eb;
+            }
+        }
+
+        .deleteBtn {
+            background: #ef4444;
+            color: white;
+            margin-left: 8px;
+
+            &:hover {
+                background: #dc2626;
+            }
+        }
+    }
+}
+.form {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    input {
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+    }
+
+    .saveBtn {
+        background: #2563eb;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+
+        &:hover {
+            background: #1d4ed8;
+        }
+    }
+}

@@ -1,137 +1,267 @@
-/* Layout tổng */
-.wrapper {
+:root {
+    --v2-bg: #f6f7fb; /* nền trang */
+    --v2-card: #ffffff; /* card/panel */
+    --v2-text: #0f172a; /* chữ chính */
+    --v2-muted: #64748b; /* chữ phụ */
+    --v2-border: #bbb8b8; /* viền */
+    --v2-ring: #60a5fa; /* focus */
+    --v2-brand: #6366f1; /* primary */
+    --v2-accent: #f59e0b; /* bar */
+    --v2-shadow: 0 8px 28px rgba(2, 6, 23, 0.06);
+    --v2-radius: 16px; /* bo góc lớn hơn */
+    --v2-grid: #eef2f6; /* lưới biểu đồ nhạt */
+}
+
+.v2Wrap {
     padding: 16px;
+    background: var(--v2-bg);
+    color: var(--v2-text);
+    font-family:
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        Helvetica,
+        Arial,
+        'Apple Color Emoji',
+        'Segoe UI Emoji';
+}
+.v2Muted {
+    color: var(--v2-muted);
+    font-size: 14px;
+}
+
+/* KPI */
+.v2KpiGrid {
     display: grid;
+    grid-template-columns: repeat(5, minmax(200px, 1fr));
     gap: 16px;
+    margin-bottom: 16px;
+}
+@media (max-width: 1280px) {
+    .v2KpiGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 900px) {
+    .v2KpiGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 560px) {
+    .v2KpiGrid {
+        grid-template-columns: 1fr;
+    }
 }
 
-/* Cards & panel cơ bản */
-.card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+.v2Kpi {
+    background: var(--v2-card);
+    border: 1px solid var(--v2-border);
+    border-radius: var(--v2-radius);
+    padding: 14px 16px;
+    box-shadow: var(--v2-shadow);
 }
-
-.cardTitle {
-    margin: 4px 0 12px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #111827;
+.v2KpiTop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
 }
-
-/* KPI grid */
-.kpiGrid {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    width: 1300px;
+.v2KpiIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: inline-block;
+    background: linear-gradient(135deg, #22d3ee, #6366f1);
 }
-
-.kpiCard {
-    @extend .card;
-    padding: 16px;
+.ic-box {
+    background: linear-gradient(135deg, #f472b6, #6366f1);
 }
-
-.kpiTitle {
-    color: #6b7280;
+.ic-cart {
+    background: linear-gradient(135deg, #f59e0b, #22d3ee);
+}
+.ic-money {
+    background: linear-gradient(135deg, #10b981, #22d3ee);
+}
+.ic-calendar {
+    background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+}
+.v2KpiTitle {
+    color: var(--v2-muted);
     font-size: 13px;
 }
-
-.kpiValue {
-    font-size: 26px;
+.v2KpiRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+.v2KpiValue {
+    font-size: 22px;
     font-weight: 700;
-    margin-top: 4px;
+}
+.v2KpiDelta {
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 4px 8px;
+}
+.v2Up {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+.v2Down {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+
+/* Cards */
+.v2Card {
+    background: var(--v2-card);
+    border: 1px solid var(--v2-border);
+    border-radius: var(--v2-radius);
+    box-shadow: var(--v2-shadow);
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+}
+.v2CardHead {
+    padding: 12px 14px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--v2-border);
+}
+.v2CardBody {
+    padding: 12px;
+    flex: 1;
 }
 
 /* Chart grid */
-.chartGrid {
+.v2ChartGrid {
     display: grid;
-    gap: 16px;
-    grid-template-columns: 2fr 1fr;
-    width: 1000px;
-
-    @media (max-width: 1024px) {
-        grid-template-columns: 1fr;
-    }
-}
-
-.chartPanel {
-    @extend .card;
-    height: 320px;
-    display: flex;
-    flex-direction: column;
-    width: 700px;
-}
-
-.chartBody {
-    flex: 1;
-    min-height: 0; /* fix overflow in rechart's container */
-}
-
-/* Bottom grid */
-.bottomGrid {
-    display: grid;
-    gap: 16px;
     grid-template-columns: 1fr 1fr;
-
-    @media (max-width: 1024px) {
+    gap: 16px;
+    margin-bottom: 16px;
+}
+@media (max-width: 1100px) {
+    .v2ChartGrid {
         grid-template-columns: 1fr;
     }
 }
 
-/* Activity list */
-.activityList {
-    @extend .card;
+/* Filters */
+.v2Filter {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.v2Select {
+    background: #fff;
+    border: 1px solid var(--v2-border);
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: var(--v2-text);
+}
+.v2DateRange :global(.react-datepicker-wrapper) {
+    width: auto;
+}
+.v2DateRange input {
+    background: #fff;
+    border: 1px solid var(--v2-border);
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: var(--v2-text);
 }
 
-.activityUl {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+/* Bottom */
+.v2BottomGrid {
     display: grid;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 50px;
+}
+@media (max-width: 1100px) {
+    .v2BottomGrid {
+        grid-template-columns: 1fr;
+    }
 }
 
-.activityItem {
+.v2ActivityUl {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+}
+.v2ActivityItem {
     display: flex;
     justify-content: space-between;
-    gap: 12px;
-    border-bottom: 1px dashed #eee;
-    padding-bottom: 6px;
+    gap: 10px;
+    font-size: 14px;
+}
+.v2ActivityWhen {
+    color: var(--v2-muted);
 }
 
-.activityWhen {
-    color: #6b7280;
-}
-
-/* Latest orders */
-.latestOrders {
-    @extend .card;
-}
-
-.table {
+/* Table */
+.v2Table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 14px;
 }
-
-.theadRow {
+.v2Table thead th {
     text-align: left;
-    border-bottom: 1px solid #eee;
+    font-weight: 600;
+    color: var(--v2-muted);
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--v2-border);
+}
+.v2Table tbody td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #f2f4f8;
+}
+.v2Table tbody tr:hover {
+    background: #fafbff;
 }
 
-.tbodyRow {
-    border-bottom: 1px solid #f3f4f6;
+.v2Status {
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid transparent;
+}
+.v2-pending {
+    background: #fff7ed;
+    color: #b45309;
+    border-color: #fde68a;
+}
+.v2-completed {
+    background: #cbf6ca;
+    color: #09fb19;
+    border-color: #c4f6bd;
+}
+.v2-processing {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+.v2-shipped {
+    background: #eef2ff;
+    color: #4f46e5;
+    border-color: #c7d2fe;
+}
+.v2-delivered {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+.v2-cancelled {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
 }
 
-.muted {
-    color: #6b7280;
-}
-
-/* Màu biểu đồ (Recharts có thể set trong JSX, giữ class dùng cho legend/custom nếu thêm) */
-.primary {
-    color: #2563eb;
-}
-.success {
-    color: #10b981;
+.v2Card svg:focus {
+    outline: none !important;
 }
